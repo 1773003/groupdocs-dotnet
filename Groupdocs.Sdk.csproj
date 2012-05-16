@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{03EA8D67-DBA0-4853-8E3A-CC182B88BB9A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Groupdocs.Sdk</RootNamespace>
+    <AssemblyName>Groupdocs.Sdk</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Staging\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Development|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Development\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'EC2|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\EC2\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Http, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\dependencies\Microsoft\Microsoft.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Http.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\dependencies\Microsoft\Microsoft.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\dependencies\Newtonsoft\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GroupdocsService.Management.cs">
+      <DependentUpon>GroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IGroupdocsService.Annotation.cs">
+      <DependentUpon>IGroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IGroupdocsService.Comparison.cs">
+      <DependentUpon>IGroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IGroupdocsService.cs" />
+    <Compile Include="IGroupdocsService.Management.cs">
+      <DependentUpon>IGroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IGroupdocsService.Signature.cs">
+      <DependentUpon>IGroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GroupdocsService.Annotation.cs">
+      <DependentUpon>GroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GroupdocsService.Comparison.cs">
+      <DependentUpon>GroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GroupdocsService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GroupdocsService.Signature.cs">
+      <DependentUpon>GroupdocsService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GroupdocsServiceException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Platform\Groupdocs.Api.Contract\Groupdocs.Api.Contract.csproj">
+      <Project>{40BF9E63-29EF-4332-AA74-5DC8B0BB0AC6}</Project>
+      <Name>Groupdocs.Api.Contract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\Groupdocs.Auxiliary\Groupdocs.Auxiliary.csproj">
+      <Project>{86F64F3C-204A-4860-9D51-874A31C6F9A8}</Project>
+      <Name>Groupdocs.Auxiliary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\Groupdocs.Common\Groupdocs.Common.csproj">
+      <Project>{91C486AD-1971-4256-A8AB-661BA34907CB}</Project>
+      <Name>Groupdocs.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\Groupdocs.Security\Groupdocs.Security.csproj">
+      <Project>{7F37454A-3E6C-410D-BEF5-752123064843}</Project>
+      <Name>Groupdocs.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Services\Groupdocs.Api.Comparison.Contract\Groupdocs.Api.Comparison.Contract.csproj">
+      <Project>{C2215974-C087-4CC2-BA39-75820504B83B}</Project>
+      <Name>Groupdocs.Api.Comparison.Contract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Services\Groupdocs.Api.Core.Contract\Groupdocs.Api.Core.Contract.csproj">
+      <Project>{FD1345B3-673C-4FFF-94A8-F2B25DE77D7E}</Project>
+      <Name>Groupdocs.Api.Core.Contract</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,16 @@
+﻿@model String
+ 
+<h2>Files uploaded to server</h2>    
+
+<div id="dialog" title="Upload files">        
+    @using (Html.BeginForm("Upload", "Viewer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" id="fileUpload" name="fileUpload" size="23"/>
+        <input type="submit" value="Upload file" />
+    }
+</div>
+<br />
+@if (!String.IsNullOrEmpty(Model))
+{
+    <iframe src="http://apps.groupdocs.com/document-viewer/embed/@Model" frameborder="0" width="600" height="500"></iframe>
+}

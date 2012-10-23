@@ -2,7 +2,8 @@ groupdocs-dotnet
 ================
 
 GroupDocs .NET SDK
-[assembly: AssemblyVersion("1.4.365.4382"), Date("23.10.2012")]
+    
+    AssemblyVersion("1.4.365.4382"), Date("23.10.2012")
 
 ###[Sign, Manage, Annotate, Assemble, Compare and Convert Documents with GroupDocs](http://groupdocs.com)
 1. [Sign documents online with GroupDocs Signature](http://groupdocs.com/apps/signature)

@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Web.Mvc;
 using Groupdocs.Sdk;
+using Groupdocs.Api.Contract;
 
 namespace AnnotationDemo.Controllers
 {
@@ -49,8 +50,27 @@ namespace AnnotationDemo.Controllers
             var userId = ConfigurationManager.AppSettings["userId"];
             var privateKey = ConfigurationManager.AppSettings["privateKey"];
 
-
-            return Json(guid, JsonRequestBehavior.AllowGet);
+            var service = new GroupdocsService(baseAddress, userId, privateKey);
+            try
+            {
+                var response = service.ListAnnotations(guid);
+                var output = "";
+                foreach (AnnotationInfo annotation in response.Annotations)
+                {
+                    var replies = "";
+                    foreach (AnnotationReplyInfo reply in annotation.Replies)
+                    {
+                        replies += reply.UserName + ": " + reply.Message;
+                    }
+                    output += "Annotation Type: " + annotation.Type + " -- Replies: " + replies + "<br/>";
+                }
+                return Json(output, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception)
+            {
+                
+                return Json("Server error or no annotations");
+            }
         }
     }
 }

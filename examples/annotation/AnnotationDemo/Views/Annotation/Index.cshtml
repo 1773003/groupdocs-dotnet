@@ -1,0 +1,37 @@
+﻿@model String
+<!DOCTYPE html>
+<html>
+<head>
+<title>.NET SDK Annotation sample</title>
+    <script src="http://rightjs.org/hotlink/right.js"  type="text/javascript"></script>
+    <script  type="text/javascript">
+        "#annotations".onClick(function (event) {
+            event.stop();
+            $('annotations_list').load("/Annotation/Poll/?guid=" + $('guid').getValue());
+        });
+    </script>
+</head>
+<body>
+<h2>Files uploaded to server</h2>    
+
+<div id="dialog" title="Upload files">        
+    @using (Html.BeginForm("Upload", "Annotation", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" id="fileUpload" name="fileUpload" size="23"/>
+        <input type="submit" value="Upload file" />
+    }
+</div>
+<br />
+@if (!String.IsNullOrEmpty(Model))
+{
+    <iframe src="http://apps.groupdocs.com/document-annotation/embed/@Model" frameborder="0" width="600" height="500"></iframe>
+    
+    <input type="button" id="annotations" value="Poll annotations" />
+    <input type="hidden" id="guid" value="@Model" />
+	<br />
+	<br />
+
+	<div id="annotations_list"></div>
+}
+</body>
+</html>

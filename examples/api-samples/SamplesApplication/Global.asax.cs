@@ -19,19 +19,73 @@ namespace SamplesApp
 
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+                routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute(
-                "Default", // Route name
-                "{controller}/{action}/{id}", // URL with parameters
-                new { controller = "Samples", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+                routes.MapRoute(
+                    "Default", // Route name
+                    "{controller}/{action}/{id}", // URL with parameters
+                    new { controller = "Samples", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+                );
+
+                routes.MapRoute(
+                    "sample01", // Route name
+                    "{controller}/{action}/{result}", // URL with parameters
+                    new { controller = "Samples", action = "sample01", result = UrlParameter.Optional } // Parameter defaults
+                );
+
+                routes.MapRoute(
+                    "sample02", // Route name
+                    "{controller}/{action}/{result}", // URL with parameters
+                    new { controller = "Samples", action = "sample02", result = UrlParameter.Optional } // Parameter defaults
+                );
+
+                routes.MapRoute(
+                   "sample03", // Route name
+                   "{controller}/{action}/{result}", // URL with parameters
+                   new { controller = "Samples", action = "sample03", result = UrlParameter.Optional } // Parameter defaults
+               );
+
+               routes.MapRoute(
+                   "sample04", // Route name
+                   "{controller}/{action}/{result}", // URL with parameters
+                   new { controller = "Samples", action = "sample04", result = UrlParameter.Optional } // Parameter defaults
+               );
+
+               routes.MapRoute(
+                  "sample05", // Route name
+                  "{controller}/{action}/{result}", // URL with parameters
+                  new { controller = "Samples", action = "sample05", result = UrlParameter.Optional } // Parameter defaults
+              );
+
+               routes.MapRoute(
+                 "sample06", // Route name
+                 "{controller}/{action}/{result}", // URL with parameters
+                 new { controller = "Samples", action = "sample06", result = UrlParameter.Optional } // Parameter defaults
+             );
+
+               routes.MapRoute(
+                "sample07", // Route name
+                "{controller}/{action}/{result}", // URL with parameters
+                new { controller = "Samples", action = "sample07", result = UrlParameter.Optional } // Parameter defaults
             );
 
-            routes.MapRoute(
-                "sample01", // Route name
-                "{controller}/{action}/{id}", // URL with parameters
-                new { controller = "Samples", action = "sample01", id = UrlParameter.Optional } // Parameter defaults
-            );
+              routes.MapRoute(
+               "sample08", // Route name
+               "{controller}/{action}/{result}", // URL with parameters
+               new { controller = "Samples", action = "sample08", result = UrlParameter.Optional } // Parameter defaults
+             );
+
+              routes.MapRoute(
+                "sample09", // Route name
+                "{controller}/{action}/{result}", // URL with parameters
+                new { controller = "Samples", action = "sample09", result = UrlParameter.Optional } // Parameter defaults
+              );
+
+              routes.MapRoute(
+                  "sample10", // Route name
+                  "{controller}/{action}/{result}", // URL with parameters
+                  new { controller = "Samples", action = "sample10", result = UrlParameter.Optional } // Parameter defaults
+                );
 
         }
 

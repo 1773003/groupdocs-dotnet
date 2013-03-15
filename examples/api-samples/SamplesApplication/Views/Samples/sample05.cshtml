@@ -1,0 +1,64 @@
+﻿@model System.Collections.Hashtable
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>GroupDocs Sample05</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+
+</head>
+<body>
+<h3 style="text-align:center;"><a href="/index.php">GroupDocs .NET SDK Samples</a> - Sample05</h3>
+
+<div class='samplecontent' style="padding:10px;">
+   <i>This sample will show how to copy / move a file using the GroupDocs Storage API using .NET SDK</i> <br/>
+   <br />
+   <a href="docs/sample01.html">Docs for this sample</a>
+   <br />
+   <br/><p>You entered:
+@if (Model != null) {
+ 
+           <p>ClientID = @Model["client_id"]</p>
+           <p>PrivateKey = @Model["private_key"]</p>
+           <p>File GuId = @Model["fileId"]</p>
+           <p>Folder = @Model["destPath"]</p>
+           <p><font color="red">@Model["error"]</font></p>
+      
+}
+   <br/>
+   <div id="requestForm" style="padding:20px; border:1px solid black;">
+   <p> Enter data for request and press "Make request" button </p>
+   @using (Html.BeginForm("sample05", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
+        <label for='client_id'>GroupDocs Client ID</label>
+        <br />
+        <input type='text', name='client_id' value="" />
+        <br />
+        <label for='private_key'>GroupDocs Private Key</label>
+        <br />
+        <input type='text', name='private_key'  value="" />
+        <br /> 
+        <label for='private_key'>FileID</label>
+       <br />
+       <input type='text', name='srcPath'  value="" />
+       <br />
+       <label for='private_key'>Folder in which you want to copy file</label>
+       <br />
+       <input type='text', name='destPath'  value="" />
+       <br />
+       <input name='copy' type='submit' value='Copy'/>
+       <input name='move' type='submit' value='Move'/>
+   }
+
+  </div>
+
+    @if (Model != null) {
+        
+        <h4><font color="green">Your file was @Model["button"] to: @Model["path"]</font></h4>
+    }
+    
+</div>
+
+    @Html.Partial("links")
+</body>
+</html>

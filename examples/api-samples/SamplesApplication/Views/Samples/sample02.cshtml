@@ -1,0 +1,60 @@
+﻿@model System.Collections.Hashtable
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>GroupDocs Sample02</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+
+</head>
+<body>
+<h3 style="text-align:center;"><a href="/index.php">GroupDocs .NET SDK Samples</a> - Sample02</h3>
+
+<div class='samplecontent' style="padding:10px;">
+   <i>This sample will show how to list files within GroupDocs Storage using .NET SDK</i> <br/>
+   <br />
+   <a href="docs/sample01.html">Docs for this sample</a>
+   <br />
+   <br/><p>You entered:
+@if (Model != null) {
+ 
+           <p>ClientID = @Model["client_id"]</p>
+           <p>PrivateKey = @Model["private_key"]</p>
+           <p><font color="red">@Model["error"]</font></p>
+      
+}
+   <br/>
+   <div id="requestForm" style="padding:20px; border:1px solid black;">
+   <p> Enter data for request and press "Make request" button </p>
+   @using (Html.BeginForm("sample02", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
+        <label for='client_id'>GroupDocs Client ID</label>
+        <br />
+        <input type='text', name='client_id' value="" />
+        <br />
+        <label for='private_key'>GroupDocs Private Key</label>
+        <br />
+        <input type='text', name='private_key'  value="" />
+        <br />
+        <input type='submit' value='Make Request'/>
+   }
+    </div>
+@if (Model != null) {
+    
+    <div  style="padding:20px; border:1px solid black;">
+        <p>Results:</p>
+        <table style="border:1px double black;">
+          <tr>
+              <th>Field</th><th>Value</th>
+          </tr>
+          <tr>
+               <td>Files list</td><td>@Model["Names"]</td>
+          </tr>
+        </table>
+   </div>
+}
+</div>
+
+    @Html.Partial("links")
+</body>
+</html>

@@ -100,8 +100,28 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\Groupdocs.Api.Comparison.Contract.dll" />
+    <Content Include="bin\Groupdocs.Api.Contract.dll" />
+    <Content Include="bin\Groupdocs.Api.Core.Contract.dll" />
+    <Content Include="bin\Groupdocs.Auxiliary.dll" />
+    <Content Include="bin\Groupdocs.Common.dll" />
+    <Content Include="bin\Groupdocs.Payments.Contract.dll" />
+    <Content Include="bin\Groupdocs.Sdk.dll" />
+    <Content Include="bin\Groupdocs.Security.dll" />
+    <Content Include="bin\Groupdocs.Swagger.dll" />
+    <Content Include="bin\Microsoft.Http.dll" />
+    <Content Include="bin\Newtonsoft.Json.dll" />
+    <Content Include="bin\SamplesApp.dll" />
+    <Content Include="bin\SamplesApp.pdb" />
     <Content Include="Global.asax" />
+    <Content Include="obj\Debug\SamplesApp.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\SamplesApp.dll" />
+    <Content Include="obj\Debug\SamplesApp.pdb" />
     <Content Include="style.css" />
+    <Content Include="Views\Samples\docs\controllers\indexcontroller.html" />
+    <Content Include="Views\Samples\docs\docco.css" />
+    <Content Include="Views\Samples\docs\nocco.css" />
+    <Content Include="Views\Samples\docs\prettify.js" />
     <Content Include="Views\Samples\style.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -116,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Views\Samples\temp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Samples\Index.cshtml" />
@@ -152,6 +173,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Samples\sample10.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <Content Include="obj\Debug\SamplesApp.csprojResolveAssemblyReference.cache" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="downloads\test.doc" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

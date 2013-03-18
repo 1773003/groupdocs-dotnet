@@ -102,6 +102,9 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="style.css" />
+    <Content Include="Views\indexcontroller.html">
+      <BrowseToURL>~/views/samples/docs/controllers/indexcontroller.html</BrowseToURL>
+    </Content>
     <Content Include="Views\Samples\style.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

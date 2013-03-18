@@ -87,6 +87,12 @@ namespace SamplesApp
                   new { controller = "Samples", action = "sample10", result = UrlParameter.Optional } // Parameter defaults
                 );
 
+              routes.MapRoute(
+                   "docs", // Route name
+                  "samples/docs/controllers/indexcontroller.html", // URL with parameters
+                   new RouteDirection() // Parameter defaults
+                 );
+
         }
 
         protected void Application_Start()

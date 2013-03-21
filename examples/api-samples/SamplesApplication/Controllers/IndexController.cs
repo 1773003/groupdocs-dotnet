@@ -726,5 +726,73 @@ namespace SamplesApp.Controllers
             }
         }
 
+        //### <i>This sample will show how to use <b>ShareDocument</b> method from Doc Api to share a document to other users</i>
+        public ActionResult Sample18()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String fileId = Request.Form["fileId"];
+                String type = Request.Form["convert_type"];
+                String callback = Request.Form["callback"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("fileId", fileId);
+                result.Add("email", type);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || fileId == null || type == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample18", null, result);
+                }
+                else
+                {
+                    
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    // Get all files from storage
+                    decimal jobId = service.ConvertFile(fileId, type, "", false, false, callback);
+                    
+                    if (jobId != null)
+                    {
+                        System.Threading.Thread.Sleep(5000);
+                        Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
+                        // Return primary email to the template
+                        if (job.Inputs[0].Outputs[0].Guid != "")
+                        {
+                            result.Add("guid", job.Inputs[0].Outputs[0].Guid);
+                            return View("Sample18", null, result);
+                        }
+                        else
+                        {
+                            result.Add("error", "File GuId is empty");
+                            return View("Sample18", null, result);
+                        }
+                    }
+                    // If request return's null return error to the template
+                    else
+                    {
+                        result.Add("error", "Convert is faile");
+                        return View("Sample18", null, result);
+                    }
+
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample18");
+            }
+        }
+
     }
 }

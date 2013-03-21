@@ -86,6 +86,12 @@ namespace SamplesApp
                   "{controller}/{action}/{result}", // URL with parameters
                   new { controller = "Samples", action = "sample10", result = UrlParameter.Optional } // Parameter defaults
                 );
+
+              routes.MapRoute(
+                    "sample18", // Route name
+                    "{controller}/{action}/{result}", // URL with parameters
+                    new { controller = "Samples", action = "sample18", result = UrlParameter.Optional } // Parameter defaults
+                  );
                         
         }
 

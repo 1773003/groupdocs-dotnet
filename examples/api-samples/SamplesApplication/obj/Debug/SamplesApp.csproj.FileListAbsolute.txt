@@ -1,12 +1,5 @@
 E:\dotnet\examples\api-samples\SamplesApplication\bin\SamplesApp.dll
 E:\dotnet\examples\api-samples\SamplesApplication\bin\SamplesApp.pdb
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Api.Contract.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Api.Core.Contract.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Auxiliary.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Common.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Sdk.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Swagger.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Microsoft.Http.dll
 E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Payments.Contract.dll
 E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Api.Comparison.Contract.dll
 E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Security.dll

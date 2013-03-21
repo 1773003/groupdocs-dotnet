@@ -726,7 +726,7 @@ namespace SamplesApp.Controllers
             }
         }
 
-        //### <i>This sample will show how to use <b>ShareDocument</b> method from Doc Api to share a document to other users</i>
+        //### <i>This sample will show how to use <b>ConvertFile</b> method from to convert a document to other type</i>
         public ActionResult Sample18()
         {
             // Check is data posted 
@@ -758,21 +758,25 @@ namespace SamplesApp.Controllers
                     
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                    // Get all files from storage
+                    //Make request to api for convert file
                     decimal jobId = service.ConvertFile(fileId, type, "", false, false, callback);
                     
                     if (jobId != null)
                     {
+                        //Delay necessary that the inquiry would manage to be processed
                         System.Threading.Thread.Sleep(5000);
+                        //Make request to api for get document info by job id
                         Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
-                        // Return primary email to the template
+                        
                         if (job.Inputs[0].Outputs[0].Guid != "")
                         {
+                            //Return file guid to the template
                             result.Add("guid", job.Inputs[0].Outputs[0].Guid);
                             return View("Sample18", null, result);
                         }
                         else
                         {
+                            //If file GuId is empty return error
                             result.Add("error", "File GuId is empty");
                             return View("Sample18", null, result);
                         }

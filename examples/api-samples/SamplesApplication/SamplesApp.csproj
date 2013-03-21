@@ -113,18 +113,16 @@
     <Content Include="bin\Newtonsoft.Json.dll" />
     <Content Include="bin\SamplesApp.dll" />
     <Content Include="bin\SamplesApp.pdb" />
+    <Content Include="docs\controllers\indexcontroller.html" />
+    <Content Include="docs\docco.css" />
+    <Content Include="docs\nocco.css" />
+    <Content Include="docs\prettify.js" />
     <Content Include="Global.asax" />
     <Content Include="obj\Debug\SamplesApp.csproj.FileListAbsolute.txt" />
     <Content Include="obj\Debug\SamplesApp.dll" />
     <Content Include="obj\Debug\SamplesApp.pdb" />
     <Content Include="style.css" />
-    <Content Include="Views\Samples\base-simple_source.html" />
-    <Content Include="Views\Samples\docs\controllers\indexcontroller.html" />
-    <Content Include="Views\Samples\docs\docco.css" />
-    <Content Include="Views\Samples\docs\nocco.css" />
-    <Content Include="Views\Samples\docs\prettify.js" />
     <Content Include="Views\Samples\style.css" />
-    <Content Include="Views\Samples\testdocument.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

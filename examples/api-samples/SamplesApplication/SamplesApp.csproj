@@ -225,6 +225,21 @@
   <ItemGroup>
     <Content Include="Views\Samples\sample21.cshtml" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\sample22.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\signature_callback.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\annotation_callback.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\sample23.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\sample24.cshtml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -247,7 +262,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>37302</DevelopmentServerPort>
+          <DevelopmentServerPort>7458</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

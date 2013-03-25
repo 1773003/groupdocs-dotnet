@@ -1,0 +1,68 @@
+﻿@model System.Collections.Hashtable
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>GroupDocs Sample24</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+
+</head>
+<body>
+<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample24</h3>
+
+<div class='samplecontent' style="padding:10px;">
+   <i>This sample will show how to use StorageApi to upload file from URL to GroupDocs account using .NET SDK</i> <br/>
+   <br />
+   <a href="/docs/controllers/indexcontroller.html#section_153">Docs for this sample</a>
+   <br />
+   <br/><p>You entered:
+@if (Model != null) {
+ 
+           <p>ClientID = @Model["client_id"]</p>
+           <p>PrivateKey = @Model["private_key"]</p>
+           <p>File URL = @Model["url"]</p>
+           <p><font color="red">@Model["error"]</font></p>
+      
+}
+   <br/>
+   <div id="requestForm" style="padding:20px; border:1px solid black;">
+   <p> Enter data for request and press "Make request" button </p>
+   @using (Html.BeginForm("sample24", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
+        <br />
+            <label for='client_id'>GroupDocs Client ID</label>
+            <br />
+            <input type='text', name='client_id' value="" />
+            <br />
+            <label for='private_key'>GroupDocs PrivateKey</label>
+            <br />
+            <input type='text', name='private_key'  value="" />
+            <br />
+            <label for='private_key'>File URL</label>
+            <br />
+            <input type='text', name='url'  value="" />
+            <br />
+            <input type='submit' value='Upload'/>
+   }
+    
+        @if (Model != null) {
+            if (Model["error"] != null)
+            {
+                @Model["error"]
+            } else {
+                  <div  style="padding:20px; border:1px solid black;">
+                    <p> Results: </p>
+                        @{
+                          
+                          <iframe src = "https://apps.groupdocs.com/document-viewer/embed/@Model["fileId"]" frameborder="0" width="700" height="700"></iframe>
+                          
+                         }
+                  </div>
+            }
+        }
+  </div>
+</div>
+
+    @Html.Partial("links")
+</body>
+</html>

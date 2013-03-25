@@ -153,10 +153,40 @@ namespace SamplesApp
                        );
 
               routes.MapRoute(
+                          "sample22", // Route name
+                          "{controller}/{action}/{result}", // URL with parameters
+                          new { controller = "Samples", action = "sample22", result = UrlParameter.Optional } // Parameter defaults
+                        );
+
+              routes.MapRoute(
+                            "sample23", // Route name
+                            "{controller}/{action}/{result}", // URL with parameters
+                            new { controller = "Samples", action = "sample23", result = UrlParameter.Optional } // Parameter defaults
+                          );
+
+              routes.MapRoute(
+                            "sample24", // Route name
+                            "{controller}/{action}/{result}", // URL with parameters
+                            new { controller = "Samples", action = "sample24", result = UrlParameter.Optional } // Parameter defaults
+                          );
+
+              routes.MapRoute(
                        "compare_callback", // Route name
                        "{controller}/{action}/{result}", // URL with parameters
                        new { controller = "Samples", action = "compare_callback", result = UrlParameter.Optional } // Parameter defaults
                      );
+
+              routes.MapRoute(
+                        "signature_callback", // Route name
+                        "{controller}/{action}/{result}", // URL with parameters
+                        new { controller = "Samples", action = "signature_callback", result = UrlParameter.Optional } // Parameter defaults
+                      );
+
+              routes.MapRoute(
+                          "annotation_callback", // Route name
+                          "{controller}/{action}/{result}", // URL with parameters
+                          new { controller = "Samples", action = "annotation_callback", result = UrlParameter.Optional } // Parameter defaults
+                        );
              
         }
 

@@ -3,15 +3,15 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<title>GroupDocs Sample21</title>
+	<title>GroupDocs Sample22</title>
     <link rel="stylesheet" type="text/css" href="/style.css" />
 
 </head>
 <body>
-<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample21</h3>
+<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample22</h3>
 
 <div class='samplecontent' style="padding:10px;">
-   <i>This sample will show how to use StorageApi to Create and Upload Envelop to GroupDocs account using .NET SDK</i> <br/>
+   <i>This sample will show how to use StorageApi to create or update user and add him to collaborators using .NET SDK</i> <br/>
    <br />
    <a href="/docs/controllers/indexcontroller.html#section_176">Docs for this sample</a>
    <br />
@@ -21,8 +21,9 @@
            <p>ClientID = @Model["client_id"]</p>
            <p>PrivateKey = @Model["private_key"]</p>
            <p>Email = @Model["email"]</p>
-           <p>Name = @Model["name"]</p>
+           <p>First Name = @Model["firstName"]</p>
            <p>Last Name = @Model["lastName"]</p>
+           <p>File Id = @Model["fileId"]</p>
            <p>Callback = @Model["callback"]</p>
            <p><font color="red">@Model["error"]</font></p>
       
@@ -30,7 +31,7 @@
    <br/>
    <div id="requestForm" style="padding:20px; border:1px solid black;">
    <p> Enter data for request and press "Make request" button </p>
-   @using (Html.BeginForm("sample21", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   @using (Html.BeginForm("sample22", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
    {
         <label for='client_id'>GroupDocs Client ID</label>
         <br />
@@ -44,17 +45,17 @@
         <br />
         <input type='text', name='email' />
         <br />
-        <label for='name'>Name</label>
+        <label for='first_name'>First Name</label>
         <br />
-        <input type='text', name='name' />
+        <input type='text', name='first_name'  value="" />
         <br />
-        <label for='lastName'>Last Name</label>
+        <label for='last_name'>Last Name</label>
         <br />
-        <input type='text', name='lastName' />
+        <input type='text', name='last_name'  value="" />
         <br />
-        <label for='file'>File</label>
+        <label for='fileId'>FileID</label>
         <br />
-        <input type='file' name='file'  />
+        <input type='text', name='fileId'  value="" />
         <br />
         <label for='callbackUrl'>callbackUrl</label>
         <br />
@@ -68,7 +69,7 @@
                 <option value="https://stage-api.groupdocs.com/v2.0">Stage</option>
         </select>
         <br />
-        <input type='submit' value='Upload'/>
+        <input type='submit' value='Make Request'/>
    }
        
         @if (Model != null) {
@@ -80,11 +81,11 @@
                         <p> Results: </p>
                         @{
                             if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
-                                <iframe src = "https://apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
+                                <iframe src = "https://apps.groupdocs.com//document-annotation2/embed/@Model["fileId"]?&uid= @Model["userId"] &download=true" frameborder="0" width="700" height="700"></iframe>
                             } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
-                                <iframe src = "https://dev-apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
+                                <iframe src = "https://dev-apps.groupdocs.com//document-annotation2/embed/@Model["fileId"]?&uid= @Model["userId"] &download=true" frameborder="0" width="700" height="700"></iframe>
                             } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
-                                <iframe src = "https://stage-apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
+                                <iframe src = "https://stage-apps.groupdocs.com//document-annotation2/embed/@Model["fileId"]?&uid= @Model["userId"] &download=true" frameborder="0" width="700" height="700"></iframe>
                             }
                          }
                    </div>

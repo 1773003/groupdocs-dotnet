@@ -88,11 +88,76 @@ namespace SamplesApp
                 );
 
               routes.MapRoute(
+                     "sample11", // Route name
+                     "{controller}/{action}/{result}", // URL with parameters
+                     new { controller = "Samples", action = "sample11", result = UrlParameter.Optional } // Parameter defaults
+                   );
+
+              routes.MapRoute(
+                       "sample12", // Route name
+                       "{controller}/{action}/{result}", // URL with parameters
+                       new { controller = "Samples", action = "sample12", result = UrlParameter.Optional } // Parameter defaults
+                     );
+
+              routes.MapRoute(
+                         "sample13", // Route name
+                         "{controller}/{action}/{result}", // URL with parameters
+                         new { controller = "Samples", action = "sample13", result = UrlParameter.Optional } // Parameter defaults
+                       );
+
+              routes.MapRoute(
+                          "sample14", // Route name
+                          "{controller}/{action}/{result}", // URL with parameters
+                          new { controller = "Samples", action = "sample14", result = UrlParameter.Optional } // Parameter defaults
+                        );
+              routes.MapRoute(
+                         "sample15", // Route name
+                         "{controller}/{action}/{result}", // URL with parameters
+                         new { controller = "Samples", action = "sample15", result = UrlParameter.Optional } // Parameter defaults
+                       );
+
+              routes.MapRoute(
+                           "sample16", // Route name
+                           "{controller}/{action}/{result}", // URL with parameters
+                           new { controller = "Samples", action = "sample16", result = UrlParameter.Optional } // Parameter defaults
+                         );
+
+              routes.MapRoute(
+                             "sample17", // Route name
+                             "{controller}/{action}/{result}", // URL with parameters
+                             new { controller = "Samples", action = "sample17", result = UrlParameter.Optional } // Parameter defaults
+                           );
+
+              routes.MapRoute(
                     "sample18", // Route name
                     "{controller}/{action}/{result}", // URL with parameters
                     new { controller = "Samples", action = "sample18", result = UrlParameter.Optional } // Parameter defaults
                   );
-                        
+
+              routes.MapRoute(
+                     "sample19", // Route name
+                     "{controller}/{action}/{result}", // URL with parameters
+                     new { controller = "Samples", action = "sample19", result = UrlParameter.Optional } // Parameter defaults
+                   );
+
+              routes.MapRoute(
+                        "sample20", // Route name
+                        "{controller}/{action}/{result}", // URL with parameters
+                        new { controller = "Samples", action = "sample20", result = UrlParameter.Optional } // Parameter defaults
+                      );
+
+              routes.MapRoute(
+                         "sample21", // Route name
+                         "{controller}/{action}/{result}", // URL with parameters
+                         new { controller = "Samples", action = "sample21", result = UrlParameter.Optional } // Parameter defaults
+                       );
+
+              routes.MapRoute(
+                       "compare_callback", // Route name
+                       "{controller}/{action}/{result}", // URL with parameters
+                       new { controller = "Samples", action = "compare_callback", result = UrlParameter.Optional } // Parameter defaults
+                     );
+             
         }
 
         protected void Application_Start()

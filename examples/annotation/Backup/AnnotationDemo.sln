@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnnotationDemo", "AnnotationDemo\AnnotationDemo.csproj", "{C5BDC735-7422-4ACA-B689-9081899A178F}"
 EndProject
 Global

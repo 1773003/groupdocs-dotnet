@@ -1,9 +1,0 @@
-E:\dotnet\examples\api-samples\SamplesApplication\bin\SamplesApp.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\SamplesApp.pdb
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Payments.Contract.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Api.Comparison.Contract.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Groupdocs.Security.dll
-E:\dotnet\examples\api-samples\SamplesApplication\bin\Newtonsoft.Json.dll
-E:\dotnet\examples\api-samples\SamplesApplication\obj\Debug\SamplesApp.dll
-E:\dotnet\examples\api-samples\SamplesApplication\obj\Debug\SamplesApp.pdb
-E:\dotnet\examples\api-samples\SamplesApplication\obj\Debug\SamplesApp.csprojResolveAssemblyReference.cache

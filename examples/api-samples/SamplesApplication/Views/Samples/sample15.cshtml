@@ -3,32 +3,30 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<title>GroupDocs Sample10</title>
+	<title>GroupDocs Sample15</title>
     <link rel="stylesheet" type="text/css" href="/style.css" />
 
 </head>
 <body>
-<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample10</h3>
+<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample15</h3>
 
 <div class='samplecontent' style="padding:10px;">
-   <i>This sample will show how to share a document to other users using .NET SDK</i> <br/>
+   <i>This sample will show how to check the number of document's views using .NET SDK</i> <br/>
    <br />
-   <a href="/docs/controllers/indexcontroller.html#section_160">Docs for this sample</a>
+   <a href="/docs/controllers/indexcontroller.html#section_6">Docs for this sample</a>
    <br />
    <br/><p>You entered:
 @if (Model != null) {
  
            <p>ClientID = @Model["client_id"]</p>
            <p>PrivateKey = @Model["private_key"]</p>
-           <p>File Id = @Model["fileId"]</p>
-           <p>Email = @Model["email"]</p>
            <p><font color="red">@Model["error"]</font></p>
-      
+   
 }
    <br/>
    <div id="requestForm" style="padding:20px; border:1px solid black;">
    <p> Enter data for request and press "Make request" button </p>
-   @using (Html.BeginForm("sample10", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   @using (Html.BeginForm("sample15", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
    {
         <label for='client_id'>GroupDocs Client ID</label>
         <br />
@@ -37,29 +35,21 @@
         <label for='private_key'>GroupDocs Private Key</label>
         <br />
         <input type='text', name='private_key'  value="" />
-        <br /> 
-        <label for='private_key'>FileID</label>
-        <br />
-        <input type='text', name='fileId'  value="" />
-        <br />
-        <label for='private_key'>Email</label>
-        <br />
-        <input type='text', name='email'  value="" />
         <br />
         <input type='submit' value='Make Request'/>
    }
-    
-        @if (Model != null) {
+       @if (Model != null) {
             if (Model["error"] != null)
             {
                 @Model["error"]
             } else {
                     <div  style="padding:20px; border:1px solid black;">
-                       <p><h3><font color="green">Document shared to user with e-mail <h1>@Model["sharer"]</h1></font></h3>
+                        <p> Results: </p>
+                        <p>Total document's views: <font color="green">@Model["views"]</font> </p>
                    </div>
             }
         }
-  </div>
+    </div>
 </div>
 
     @Html.Partial("links")

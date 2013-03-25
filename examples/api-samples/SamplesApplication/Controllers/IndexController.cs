@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Web.Mvc;
 using Groupdocs.Sdk;
+using Groupdocs.Api; 
 
 namespace SamplesApp.Controllers
 {
@@ -726,6 +727,483 @@ namespace SamplesApp.Controllers
             }
         }
 
+        //### <i>This sample will show how programmatically create and post an annotation into document</i>
+        public ActionResult Sample11()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String fileId = Request.Form["fileId"];
+                String annotation_type = Request.Form["annotation_type"];
+                String box_x = Request.Form["box_x"];
+                String box_y = Request.Form["box_y"];
+                String box_width = Request.Form["box_width"];
+                String box_height = Request.Form["box_height"];
+                String annotationPosition_x = Request.Form["annotationPosition_x"];
+                String annotationPosition_y = Request.Form["annotationPosition_y"];
+                String range_position = Request.Form["range_position"];
+                String range_length = Request.Form["range_length"];
+                String text = Request.Form["text"];
+             
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("fileId", fileId);
+                result.Add("type", annotation_type);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || fileId == null || annotation_type == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample11", null, result);
+                }
+                else
+                {
+
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    //Make request to api for convert file
+                   Groupdocs.Common.AnnotationType type = new Groupdocs.Common.AnnotationType();
+                   Groupdocs.Api.Contract.Rectangle rectangle = new Groupdocs.Api.Contract.Rectangle();
+                   Groupdocs.Api.Contract.Data.Point point = new Groupdocs.Api.Contract.Data.Point();
+                   Groupdocs.Api.Contract.Range range = new Groupdocs.Api.Contract.Range();
+                   if (annotation_type == "point") 
+                   {
+                       type = Groupdocs.Common.AnnotationType.Point;
+                       rectangle.X = float.Parse(box_x);
+                       rectangle.Y = float.Parse(box_y);
+                       rectangle.Width = 0;
+                       rectangle.Height = 0;
+                       point.X = 0;
+                       point.Y = 0;
+
+                   }
+                   else if (annotation_type == "text")
+                   {
+                       type = Groupdocs.Common.AnnotationType.Text;
+                       point.X = double.Parse(annotationPosition_x);
+                       point.Y = double.Parse(annotationPosition_y);
+                       range.Length = Int32.Parse(range_length);
+                       range.Position = Int32.Parse(range_position);
+                   }
+                   else
+                   {
+                       type = Groupdocs.Common.AnnotationType.Area;
+                       point.X = 0;
+                       point.Y = 0;
+                       rectangle.X = float.Parse(box_x);
+                       rectangle.Y = float.Parse(box_y);
+                       rectangle.Width = float.Parse(box_width);
+                       rectangle.Height = float.Parse(box_height);
+                   }
+
+                   Groupdocs.Api.Contract.Annotation.CreateAnnotationResult annotation = service.CreateAnnotation(fileId, type, rectangle, point, range, null, null);
+                   if (annotation.DocumentGuid != "")
+                   {
+                       result.Add("guid", annotation.DocumentGuid);
+                       return View("Sample11", null, result);
+                   }
+                   else
+                   {
+                       result.Add("error", "Annotation is fail");
+                       return View("Sample11", null, result);
+                   }
+                    
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample11");
+            }
+        }
+
+        //### <i>This sample will show how to use <b>ShareDocument</b> method from Doc Api to share a document to other users</i>
+        public ActionResult Sample12()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String fileId = Request.Form["fileId"];
+               
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("fileId", fileId);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || fileId == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample12", null, result);
+                }
+                else
+                {
+                   
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    // Get all files from storage
+                    Groupdocs.Api.Contract.Annotation.ListAnnotationsResult annotations = service.ListAnnotations(fileId);
+                    // If file wasn't found return error
+                    if (annotations.Annotations.Length == 0)
+                    {
+
+                        message = "File GuId you are entered is wrong";
+                        result.Add("error", message);
+                        return View("Sample12", null, result);
+
+                    }
+                    // Return primary email to the template
+                    String annotation = "";
+                    String replies = "";
+                    String block = "";
+                    for (int i = 0; i < annotations.Annotations.Length; i++)
+                    {
+
+                        annotation = "Access: " + annotations.Annotations[i].Access + "<br />" + "Type: " +
+                                            annotations.Annotations[i].Type + "<br />";
+                        if (annotations.Annotations[i].Replies.Length == 0)
+                        {
+                            replies = "";
+                           
+                        }
+                        else
+                        {
+                            for (int n = i; n < annotations.Annotations[i].Replies.Length; n++)
+                            {
+                                replies += "<li>" + annotations.Annotations[i].Replies[n].UserName +
+                                                    " : " + annotations.Annotations[i].Replies[n].Message + "</li>";
+                            }
+                        }
+                        block += "<div>" + annotation + "Replies: " + "<ul>" + replies + "</ul>" + "<hr />" + "</div>";
+                    }
+                    
+                    MvcHtmlString div = MvcHtmlString.Create(block);
+                    result.Add("div", div);
+                    return View("Sample12", null, result);
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample12");
+            }
+        }
+        //### <i>This sample will show how to use <b>ShareDocument</b> method from Doc Api to share a document to other users</i>
+        public ActionResult Sample13()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String fileId = Request.Form["fileId"];
+                String email = Request.Form["email"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("fileId", fileId);
+                result.Add("email", email);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || fileId == null || email == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample13", null, result);
+                }
+                else
+                {
+                    // Create string array with emails
+                    String[] collaborators = new String[1];
+                    collaborators[0] = email;
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    // Make request to share document
+                    Groupdocs.Api.Contract.Annotation.SetCollaboratorsResult collaborate = service.SetAnnotationCollaborators(fileId, collaborators);
+                    // Check is request return data
+                    if (collaborate != null)
+                    {
+                        // Return primary email to the template
+                        result.Add("collaborator", collaborate.Collaborators[0].PrimaryEmail);
+                        return View("Sample13", null, result);
+                    }
+                    // If request return's null return error to the template
+                    else
+                    {
+                        message = "Something is wrong with your data";
+                        result.Add("error", message);
+                        return View("Sample13", null, result);
+                    }
+
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample13");
+            }
+        }
+        //### <i>This sample will show how to use <b>ShareDocument</b> method from Doc Api to share a document to other users</i>
+        public ActionResult Sample14()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String path = Request.Form["path"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("path", path);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || path == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample14", null, result);
+                }
+                else
+                {
+                    String properPath = path.Replace("(\\/)", "/");
+                    String[] pathArray = properPath.Split('/');
+                    String lastFolder = "";
+                    String newPath = "";
+                    if (pathArray.Length > 1)
+                    {
+                        lastFolder = pathArray[pathArray.Length - 1];
+                        newPath = String.Join("/", pathArray);
+                    }
+                    else
+                    {
+                        lastFolder = pathArray[0];
+                    }
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    // Make request to share document
+                    Groupdocs.Api.Contract.ListEntitiesResult folders = service.GetFileSystemEntities("", 0, -1, null, true, null, null);
+                    decimal folderId = new decimal();
+                    if (folders.Folders != null)
+                    {
+                        for (int i = 0; i < folders.Folders.Length; i++)
+                        {
+                            if (folders.Folders[i].Name == lastFolder)
+                            {
+                                folderId = folders.Folders[i].Id;
+                            }
+                        }
+                    }
+                    Groupdocs.Api.Contract.UserInfo[] shares = service.GetFolderSharers(folderId);
+                    // Check is request return data
+                    if (shares.Length != 0)
+                    {
+                        String emails = "";
+                        for (int n = 0; n < shares.Length; n++)
+                        {
+                            emails += shares[n].PrimaryEmail + "<br />";
+                        }
+                         MvcHtmlString email = MvcHtmlString.Create(emails);
+                        // Return primary email to the template
+                        result.Add("shares", email);
+                        return View("Sample14", null, result);
+                    }
+                    // If request return's null return error to the template
+                    else
+                    {
+                        message = "Something is wrong with your data";
+                        result.Add("error", message);
+                        return View("Sample14", null, result);
+                    }
+
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample14");
+            }
+        }
+        //### <i>This sample will show how to use <b>Signer object</b> to be authorized at GroupDocs and how to get GroupDocs user infromation using .NET SDK</i>
+        public ActionResult Sample15()
+        {
+            // Check is data posted    
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                Groupdocs.Api.Contract.DocumentViewsResult userInfo = null;
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null)
+                {
+                    //If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    // Transfer error message to template
+                    return View("Sample15", null, result);
+                }
+                else
+                {
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    // Get info about user account
+                    userInfo = service.GetDocumentViews(0);
+                    result.Add("views", userInfo.Views.Length);
+                    // Return Hashtable with results to the template
+                    return View("Sample15", null, result);
+                }
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample15");
+            }
+        }
+        //### <i>This sample will show how to use <b>Signer object</b> to be authorized at GroupDocs and how to get GroupDocs user infromation using .NET SDK</i>
+        public ActionResult Sample16()
+        {
+            // Check is data posted    
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String fileId = Request.Form["fileId"];
+                String message = "";
+                if (fileId == null)
+                {
+                    //If not all fields entered send error message
+                    message = "Please enter File Id";
+                    result.Add("error", message);
+                    // Transfer error message to template
+                    return View("Sample16", null, result);
+                }
+                else
+                {
+                    result.Add("guid", fileId);
+                   
+                }
+                // Transfer error message to template
+                return View("Sample16", null, result);
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample16");
+            }
+        }
+        //### <i>This sample will show how to use <b>UploadFile</b> method from Storage Api to upload file to GroupDocs Storage </i>
+        public ActionResult Sample17()
+        {
+            // Check is data posted   
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                Groupdocs.Api.Contract.UploadRequestResult upload = null;
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || Request.Files == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    // Transfer error message to template
+                    return View("Sample17", null, result);
+                }
+                else
+                {
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    //### Upload file
+                    // Get tag's names from form
+                    foreach (string inputTagName in Request.Files)
+                    {
+                        var file = Request.Files[inputTagName];
+                        // Check that file is not fake.
+                        if (file.ContentLength > 0)
+                        {
+                            // Upload file with empty description.
+                            upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                            // Check is upload successful
+                            if (upload.Id != null)
+                            {
+                                // Put uploaded file GuId to the result's list
+                                decimal Id = service.CompressFile(upload.Id, Groupdocs.Common.ArchiveType.Zip);
+                               if (Id != null)
+                               {
+                                   //Make request to api for get document info by job id
+                                   Groupdocs.Api.Contract.ListEntitiesResult files = service.GetFileSystemEntities("", 0, -1, null, true, null, null);
+                                   String name = "";
+                                   if (files.Files.Length != 0)
+                                   {
+                                       for (int i = 0; i < files.Files.Length; i++)
+                                       {
+                                           if (files.Files[i].Id == Id)
+                                           {
+                                               name = files.Files[i].Name;
+                                           }
+                                       }
+                                           result.Add("message", "Archive created and saved successfully as " + name);
+                                       return View("Sample17", null, result);
+                                   }
+                                   else
+                                   {
+                                       //If file GuId is empty return error
+                                       result.Add("error", "File Name is empty");
+                                       return View("Sample17", null, result);
+                                   }
+                               }
+                            }
+                            // If upload was failed return error
+                            else
+                            {
+                                message = "UploadFile returns error";
+                                result.Add("error", message);
+                                return View("Sample17", null, result);
+                            }
+                        }
+                    }
+                    // Redirect to viewer with received GUID.
+                    return View("Sample17", null, result);
+                }
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample17");
+            }
+        }
         //### <i>This sample will show how to use <b>ConvertFile</b> method from to convert a document to other type</i>
         public ActionResult Sample18()
         {
@@ -743,7 +1221,7 @@ namespace SamplesApp.Controllers
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
                 result.Add("fileId", fileId);
-                result.Add("email", type);
+                result.Add("type", type);
                 String message = null;
                 // Check is all needed fields are entered
                 if (userId == null || private_key == null || fileId == null || type == null)
@@ -797,6 +1275,309 @@ namespace SamplesApp.Controllers
                 return View("Sample18");
             }
         }
+        //### <i>This sample will show how to use <b>ConvertFile</b> method from to convert a document to other type</i>
+        public ActionResult Sample19()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String sourceFileId = Request.Form["sourceFileId"];
+                String targetFileId = Request.Form["targetFileId"];
+                String callback = Request.Form["callback"];
+                String basePath = Request.Form["server_type"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("sourceFileId", sourceFileId);
+                result.Add("targetFileId", targetFileId);
+                result.Add("callback", callback);
+                result.Add("basePath", basePath);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || sourceFileId == null || targetFileId == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample19", null, result);
+                }
+                else
+                {
 
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Make request to api for convert file
+                    Groupdocs.Api.Comparison.Contract.CompareResponse compare = service.Compare(sourceFileId, targetFileId, callback);
+
+                    if (compare.Status != null)
+                    {
+                        //Delay necessary that the inquiry would manage to be processed
+                        System.Threading.Thread.Sleep(5000);
+                        //Make request to api for get document info by job id
+                        Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(compare.Result.JobId);
+
+                        if (job.Outputs[0].Guid != null)
+                        {
+                            //Return file guid to the template
+                            result.Add("guid", job.Outputs[0].Guid);
+                            return View("Sample19", null, result);
+                        }
+                        else
+                        {
+                            //If file GuId is empty return error
+                            result.Add("error", "File GuId is empty");
+                            return View("Sample19", null, result);
+                        }
+                    }
+                    // If request return's null return error to the template
+                    else
+                    {
+                        result.Add("error", compare.ErrorMessage);
+                        return View("Sample19", null, result);
+                    }
+
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample19");
+            }
+        }
+
+        //### <i>This sample will show how to use <b>ConvertFile</b> method from to convert a document to other type</i>
+        public ActionResult Sample20()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String resultFileId = Request.Form["resultFileId"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("sourceFileId", resultFileId);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || resultFileId == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample20", null, result);
+                }
+                else
+                {
+
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    //Make request to api for convert file
+                    Groupdocs.Api.Comparison.Contract.ChangesResponse info = service.GetChanges(resultFileId);
+
+                    if (info.Status != null)
+                    {
+                       
+		                String action = null;
+		                String width = null;
+                        String height = null;
+		                String text = null;
+		                String type = null;    
+                        String table = "<table class='border'>";
+                        table += "<tr><td><font color='green'>Change Name</font></td><td><font color='green'>Change</font></td></tr>";
+                        //Count of iterations
+                                                        
+						for (int i = 0; i < info.Result.Changes.Length; i++) {
+						
+							if (info.Result.Changes[i].Action == null) {
+								action = "";
+							} else {
+								action = info.Result.Changes[i].Action;
+							}
+							
+							if (info.Result.Changes[i].Page == null) {
+								width = "";
+							} else {
+								width = Convert.ToString(info.Result.Changes[i].Page.Width);
+							}
+
+                            if (info.Result.Changes[i].Page == null) {
+								height = "";
+							} else {
+								height = Convert.ToString(info.Result.Changes[i].Page.Height);
+							}
+							
+							if ( info.Result.Changes[i].Text == null) {
+								text = "";
+							} else {
+								text = info.Result.Changes[i].Text;
+							}
+							
+							if ( info.Result.Changes[i].Type == null) {
+								type = "";
+							} else {
+								type = info.Result.Changes[i].Type;
+							}
+							
+							table += "<tr><td>Id</td><td>" + info.Result.Changes[i].Id + "</td></tr>";
+							table += "<tr><td>Action</td><td>" + action + "</td></tr>";
+							table += "<tr><td>Text</td><td>" + text + "</td></tr>";
+							table += "<tr><td>Type</td><td>" + type + "</td></tr>";
+							table += "<tr><td>Width</td><td>" + width + "</td></tr>";
+                            table += "<tr><td>Height</td><td>" + height + "</td></tr>";
+							table += "<tr bgcolor='#808080'><td></td><td></td></tr>";
+                        }
+
+                        table += "</table>";
+                        MvcHtmlString infoTable = MvcHtmlString.Create(table);
+                        result.Add("info", infoTable);
+                        return View("SAmple20", null, result);
+                    }
+                    // If request return's null return error to the template
+                    else
+                    {
+                        result.Add("error", info.ErrorMessage);
+                        return View("Sample20", null, result);
+                    }
+
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample20");
+            }
+        }
+
+        //### <i>This sample will show how to use <b>ConvertFile</b> method from to convert a document to other type</i>
+        public ActionResult Sample21()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String email = Request.Form["email"];
+                String name = Request.Form["name"];
+                String lastName = Request.Form["lastName"];
+                String callback = Request.Form["callback"];
+                var documet = Request.Files["file"];
+                String basePath = Request.Form["server_type"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("email", email);
+                result.Add("name", name);
+                result.Add("lastName", lastName);
+                result.Add("callback", callback);
+                result.Add("basePath", basePath);
+                String message = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || email == null || lastName == null || name == null || documet == null)
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample21", null, result);
+                }
+                else
+                {
+
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Make request to api for convert file
+                    Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(documet.FileName, String.Empty, documet.InputStream);
+
+                    if (upload.Guid != null)
+                    {
+                        Groupdocs.Api.Contract.SignatureEnvelopeResponse envelop = service.CreateEnvelope("", "", documet.FileName, upload.Guid, false);
+                        if (envelop.Status.Equals("Ok"))
+                        {
+                            decimal dec = new decimal();
+                            //Groupdocs.Api.Contract.SignatureEnvelopeDocumentResponse addDocumentEnvelop = service.AddEnvelopeDocument(envelop.Result.Envelope.Id, upload.Guid, dec);
+                           // if (addDocumentEnvelop.Status.Equals("Ok"))
+                           // {
+                                Groupdocs.Api.Contract.RoleInfo[] roles = service.GetRoles();
+                                decimal roleId = new decimal();
+                                for (int i = 0; i < roles.Length; i++)
+                                {
+                                    if (roles[i].Name.Equals("Signer"))
+                                    {
+                                        roleId = roles[i].Id;
+                                    }
+                                }
+                                Groupdocs.Api.Contract.SignatureEnvelopeRecipientResponse addRecipient = service.AddEnvelopeRecipient(envelop.Result.Envelope.Id, email, name, lastName, Convert.ToString(roleId), dec);
+                                Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
+                                if (send.Status.Equals("Ok"))
+                                {
+                                    result.Add("envelop", envelop.Result.Envelope.Id);
+                                    result.Add("recipient", addRecipient.Result.Recipient.Id);
+                                    return View("Sample21", null, result);
+                                }
+                                else
+                                {
+                                    result.Add("error", send.ErrorMessage);
+                                    return View("Sample21", null, result);
+                                }
+                           // }
+                           // else
+                          //  {
+                          //      result.Add("error", addDocumentEnvelop.ErrorMessage);
+                          //      return View("Sample21", null, result);
+                          //  }
+                        }
+                        else
+                        {
+                            result.Add("error", envelop.ErrorMessage);
+                            return View("Sample21", null, result);
+                        }
+                    }
+                    // If request return's null return error to the template
+                    else
+                    {
+                        result.Add("error", "Upload is failed");
+                        return View("Sample21", null, result);
+                    }
+
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample21");
+            }
+        }
+
+        public ActionResult compare_callback()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/compare_callback.txt";
+                System.IO.StreamWriter w;
+                w = System.IO.File.CreateText(filePath);
+                w.WriteLine(Request.Form);
+                w.Flush();
+                w.Close();
+                String r = System.IO.File.ReadAllText(filePath);
+                return View("compare_callback", null, r);
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("compare_callback");
+            }
+        }
     }
 }

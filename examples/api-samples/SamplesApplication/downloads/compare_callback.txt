@@ -1,0 +1,1 @@
+client_id=b912b34d1621a895&private_key=701b7b219b50dfa23b0b513d03e9f0d0&sourceFileId=3bcd30ce5878666d29ef3bb0bd27ed70b1a34b3bb3a0eb52213774726923ae32&targetFileId=d51b7edbc59e41bf156f6e2d2b6e556ad269f0e44c94a22ea3c8c893415add52&callbackUrl=http%3a%2f%2flocalhost%3a37302%2fsamples%2fcompare_callback&server_type=https%3a%2f%2fapi.groupdocs.com%2fv2.0

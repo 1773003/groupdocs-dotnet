@@ -2,8 +2,30 @@ groupdocs-dotnet
 ================
 
 GroupDocs .NET SDK
-    
-    AssemblyVersion("1.4.365.4382"), Date("23.10.2012")
+####################################
+
+Requirements
+************
+
+-  SDK requires .NET 4.0 (or later).
+
+Installation
+************
+
+You can use this repository to download and install SDK manually. Also GroupDocs SDK is now
+in `NUGET`.
+
+Nuget package: https://nuget.org/packages/groupdocs-dotnet/
+
+Last SDK version: 2.3.0.
+
+Usage Example
+*************
+
+    // Create service for Groupdocs account
+    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+    // Get info about user account
+    userInfo = service.GetUserProfile();
 
 ###[Sign, Manage, Annotate, Assemble, Compare and Convert Documents with GroupDocs](http://groupdocs.com)
 1. [Sign documents online with GroupDocs Signature](http://groupdocs.com/apps/signature)

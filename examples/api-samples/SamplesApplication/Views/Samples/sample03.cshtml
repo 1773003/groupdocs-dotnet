@@ -37,49 +37,95 @@
         <br />
         <input type='text', name='private_key'  value="" />
         <br /> 
-        <label for='file'>File</label>
-        <br />
-        <input type='file' name='file'  />
-        <br />
-       <br />
-        <p><font color="green">Or you can enter URL from where to upload file</font></p>
-        <br />
-        <label for='private_key'>File URL</label>
-        <br />
-        <input type='text', name='url'  value="" />
-        <br />
-        <label for='server_type'>Base Path</label>
+       <label for='server_type'>Base Path</label>
          <br />
         <input name="server_type" id="server_type" />
         <br />
+        <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');">Local file </input>
+                                                                         <br />
+        <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >From URL </input>
+                                                                     <br />
+         
+        <br />
+        <label for='file' id="file">File</label>
+        <br />
+        <input type='file' name='file' id="filefield" />
+        <br />
+        <label for='private_key' style="display:none;" id="url">File URL</label>
+        <br />
+        <input type='text', name='url'  value="" id="urlfield" style="display:none;" />
+        <br />
+        
         <input type='submit' value='Make Request'/>
    }
     </div>
-@if (Model != null) {
+@if (Model != null)
+{
     
     <div  style="padding:20px; border:1px solid black;">
         <p>Results:</p>
-        @if (Model["error"] != null) {
+        @if (Model["error"] != null)
+        {
             @Model["error"]
-        } else {
-            
-             if(Model["basePath"].Equals("")) {
+        }
+        else
+        {
+
+            if (Model["basePath"].Equals(""))
+            {
                 <iframe src = "https://apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
-            }else if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
+            }
+            else if (Model["basePath"].Equals("https://api.groupdocs.com/v2.0"))
+            {
                 <iframe src = "https://apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
-            } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
+            }
+            else if (Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0"))
+            {
                 <iframe src = "https://dev-apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
-            } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
+            }
+            else if (Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0"))
+            {
                 <iframe src = "https://stage-apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
-            } else if(Model["basePath"].Equals("https://realtime-api.groupdocs.com/v2.0")) {
+            }
+            else if (Model["basePath"].Equals("https://realtime-api.groupdocs.com/v2.0"))
+            {
                 <iframe src = "https://realtime-apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
             }
-                       
+
         }
     </div>
 }
 </div>
 
     @Html.Partial("links")
+
+    <script type="text/javascript">
+        function display(_element_id) {
+
+            if (_element_id == "local") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+
+            }
+
+            if (_element_id == "url") {
+                var element1 = document.getElementById("url");
+                var element2 = document.getElementById("urlfield");
+                var element3 = document.getElementById("file");
+                var element4 = document.getElementById("filefield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+            }
+           
+        }
+</script>
 </body>
 </html>

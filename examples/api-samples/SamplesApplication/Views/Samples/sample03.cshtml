@@ -20,8 +20,9 @@
  
            <p>ClientID = @Model["client_id"]</p>
            <p>PrivateKey = @Model["private_key"]</p>
+           <p>Base path = @Model["basePath"]</p>
            <p><font color="red">@Model["error"]</font></p>
-      
+           
 }
    <br/>
    <div id="requestForm" style="padding:20px; border:1px solid black;">
@@ -40,6 +41,17 @@
         <br />
         <input type='file' name='file'  />
         <br />
+       <br />
+        <p><font color="green">Or you can enter URL from where to upload file</font></p>
+        <br />
+        <label for='private_key'>File URL</label>
+        <br />
+        <input type='text', name='url'  value="" />
+        <br />
+        <label for='server_type'>Base Path</label>
+         <br />
+        <input name="server_type" id="server_type" />
+        <br />
         <input type='submit' value='Make Request'/>
    }
     </div>
@@ -50,7 +62,19 @@
         @if (Model["error"] != null) {
             @Model["error"]
         } else {
-            <iframe src="https://apps.groupdocs.com/document-viewer/Embed/ @Model["guid"] "?frameborder=0 width=720 height=600></iframe>
+            
+             if(Model["basePath"].Equals("")) {
+                <iframe src = "https://apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+            }else if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
+                <iframe src = "https://apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+            } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
+                <iframe src = "https://dev-apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+            } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
+                <iframe src = "https://stage-apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+            } else if(Model["basePath"].Equals("https://realtime-api.groupdocs.com/v2.0")) {
+                <iframe src = "https://realtime-apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+            }
+                       
         }
     </div>
 }

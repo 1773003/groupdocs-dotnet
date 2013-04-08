@@ -143,8 +143,11 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
+                String url = Request.Form["url"];
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
+                result.Add("url", url);
                 Groupdocs.Api.Contract.UploadRequestResult upload = null;
                 String message = null;
                 // Check is all needed fields are entered
@@ -158,32 +161,57 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
-                    // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                    //### Upload file
-                    // Get tag's names from form
-                    foreach (string inputTagName in Request.Files)
+                    if (basePath == "")
                     {
-                        var file = Request.Files[inputTagName];
-                        // Check that file is not fake.
-                        if (file.ContentLength > 0)
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    result.Add("basePath", basePath);
+                    if (url == "")
+                    {
+                        //### Upload file
+                        // Get tag's names from form
+                        foreach (string inputTagName in Request.Files)
                         {
-                            // Upload file with empty description.
-                            upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
-                            // Check is upload successful
-                            if (upload.Guid != null)
+                            var file = Request.Files[inputTagName];
+                            // Check that file is not fake.
+                            if (file.ContentLength > 0)
                             {
-                                // Put uploaded file GuId to the result's list
-                                result.Add("guid", upload.Guid);
-                                
+                                // Upload file with empty description.
+                                upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                                // Check is upload successful
+                                if (upload.Guid != null)
+                                {
+                                    // Put uploaded file GuId to the result's list
+                                    result.Add("guid", upload.Guid);
+
+                                }
+                                // If upload was failed return error
+                                else
+                                {
+                                    message = "UploadFile returns error";
+                                    result.Add("error", message);
+                                    return View("Sample03", null, result);
+                                }
                             }
-                            // If upload was failed return error
-                            else
-                            {
-                                message = "UploadFile returns error";
-                                result.Add("error", message);
-                                return View("Sample03", null, result);
-                            }
+                        }
+                    }
+                    else
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //If file uploaded return his GuId to template
+                            result.Add("guid", guid);
+                            return View("Sample03", null, result);
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample03", null, result);
                         }
                     }
                     // Redirect to viewer with received GUID.

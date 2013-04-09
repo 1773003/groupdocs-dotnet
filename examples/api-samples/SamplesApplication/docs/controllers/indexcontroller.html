@@ -4489,6 +4489,8 @@ Pass GUID of the document as model.</p>
                 String private_key = Request.Form[&quot;private_key&quot;];
                 String fileId = Request.Form[&quot;fileId&quot;];
                 String type = Request.Form[&quot;convert_type&quot;];
+                String url = Request.Form[&quot;url&quot;];
+                var file = Request.Files[&quot;file&quot;];
                 String callback = Request.Form[&quot;callback&quot;];
 </code></pre>
 						</td>
@@ -4553,6 +4555,8 @@ Pass GUID of the document as model.</p>
 						</td>
 						<td class="code">
 							<pre><code class='prettyprint'>                    GroupdocsService service = new GroupdocsService(&quot;https://api.groupdocs.com/v2.0&quot;, userId, private_key);
+                    if (url != &quot;&quot;)
+                    {
 </code></pre>
 						</td>
 					</tr>
@@ -4561,14 +4565,13 @@ Pass GUID of the document as model.</p>
 							<div class="pilwrap">
 								<a class="pilcrow" href="#section_295">&#182;</a>
 							</div>
-							<p>Make request to api for convert file</p>
+							<p>Make request to upload file from entered Url</p>
 
 						</td>
 						<td class="code">
-							<pre><code class='prettyprint'>                    decimal jobId = service.ConvertFile(fileId, type, &quot;&quot;, false, false, callback);
-                    
-                    if (jobId != null)
-                    {
+							<pre><code class='prettyprint'>                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
 </code></pre>
 						</td>
 					</tr>
@@ -4576,6 +4579,106 @@ Pass GUID of the document as model.</p>
 						<td class="docs">
 							<div class="pilwrap">
 								<a class="pilcrow" href="#section_296">&#182;</a>
+							</div>
+							<p>If file uploaded return his GuId</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            fileId = guid;
+
+                        }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_297">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_297">&#182;</a>
+							</div>
+							<p>If file wasn't uploaded return error</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        else
+                        {
+                            result.Add(&quot;error&quot;, &quot;Something wrong with entered data&quot;);
+                            return View(&quot;Sample18&quot;, null, result);
+                        }
+                    }
+                    else if (file != null)
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_298">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_298">&#182;</a>
+							</div>
+							<p>Upload local file </p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        if (upload.Guid != null)
+                        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_299">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_299">&#182;</a>
+							</div>
+							<p>If file uploaded return his guid</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            fileId = upload.Guid;
+                        }
+                        else
+                        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_300">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_300">&#182;</a>
+							</div>
+							<p>If file wasn't uploaded return error</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            result.Add(&quot;error&quot;, &quot;Something wrong with entered data&quot;);
+                            return View(&quot;Sample18&quot;, null, result);
+                        }
+                    }
+                   
+                    
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_301">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_301">&#182;</a>
+							</div>
+							<p>Make request to api for convert file</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    decimal jobId = service.ConvertFile(fileId, type, &quot;&quot;, false, false, callback);
+
+                    if (jobId != null)
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_302">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_302">&#182;</a>
 							</div>
 							<p>Delay necessary that the inquiry would manage to be processed</p>
 
@@ -4585,26 +4688,26 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_297">
+					<tr id="section_303">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_297">&#182;</a>
+								<a class="pilcrow" href="#section_303">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
 						</td>
 						<td class="code">
 							<pre><code class='prettyprint'>                        Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
-                        
+
                         if (job.Inputs[0].Outputs[0].Guid != &quot;&quot;)
                         {
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_298">
+					<tr id="section_304">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_298">&#182;</a>
+								<a class="pilcrow" href="#section_304">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -4618,10 +4721,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_299">
+					<tr id="section_305">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_299">&#182;</a>
+								<a class="pilcrow" href="#section_305">&#182;</a>
 							</div>
 							<p>If file GuId is empty return error</p>
 
@@ -4634,10 +4737,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_300">
+					<tr id="section_306">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_300">&#182;</a>
+								<a class="pilcrow" href="#section_306">&#182;</a>
 							</div>
 							<p>If request return's null return error to the template</p>
 
@@ -4648,17 +4751,19 @@ Pass GUID of the document as model.</p>
                         result.Add(&quot;error&quot;, &quot;Convert is faile&quot;);
                         return View(&quot;Sample18&quot;, null, result);
                     }
-
+                        
+                   
+                   
                 }
 
             }
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_301">
+					<tr id="section_307">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_301">&#182;</a>
+								<a class="pilcrow" href="#section_307">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -4672,10 +4777,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_302">
+					<tr id="section_308">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_302">&#182;</a>
+								<a class="pilcrow" href="#section_308">&#182;</a>
 							</div>
 							<h3><i>This sample will show how to Compare documents</i></h3>
 
@@ -4686,10 +4791,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_303">
+					<tr id="section_309">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_303">&#182;</a>
+								<a class="pilcrow" href="#section_309">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -4700,10 +4805,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_304">
+					<tr id="section_310">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_304">&#182;</a>
+								<a class="pilcrow" href="#section_310">&#182;</a>
 							</div>
 							<h3>Set variables and get POST data</h3>
 
@@ -4719,10 +4824,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_305">
+					<tr id="section_311">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_305">&#182;</a>
+								<a class="pilcrow" href="#section_311">&#182;</a>
 							</div>
 							<p>Set entered data to the results list</p>
 
@@ -4738,10 +4843,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_306">
+					<tr id="section_312">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_306">&#182;</a>
+								<a class="pilcrow" href="#section_312">&#182;</a>
 							</div>
 							<p>Check is all needed fields are entered</p>
 
@@ -4752,10 +4857,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_307">
+					<tr id="section_313">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_307">&#182;</a>
+								<a class="pilcrow" href="#section_313">&#182;</a>
 							</div>
 							<p>If not all fields entered send error message</p>
 
@@ -4771,10 +4876,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_308">
+					<tr id="section_314">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_308">&#182;</a>
+								<a class="pilcrow" href="#section_314">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -4784,10 +4889,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_309">
+					<tr id="section_315">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_309">&#182;</a>
+								<a class="pilcrow" href="#section_315">&#182;</a>
 							</div>
 							<p>Compare two documents and setting collback Url</p>
 
@@ -4800,10 +4905,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_310">
+					<tr id="section_316">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_310">&#182;</a>
+								<a class="pilcrow" href="#section_316">&#182;</a>
 							</div>
 							<p>Delay necessary that the inquiry would manage to be processed</p>
 
@@ -4813,10 +4918,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_311">
+					<tr id="section_317">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_311">&#182;</a>
+								<a class="pilcrow" href="#section_317">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -4829,10 +4934,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_312">
+					<tr id="section_318">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_312">&#182;</a>
+								<a class="pilcrow" href="#section_318">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -4846,10 +4951,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_313">
+					<tr id="section_319">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_313">&#182;</a>
+								<a class="pilcrow" href="#section_319">&#182;</a>
 							</div>
 							<p>If file GuId is empty return error</p>
 
@@ -4862,10 +4967,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_314">
+					<tr id="section_320">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_314">&#182;</a>
+								<a class="pilcrow" href="#section_320">&#182;</a>
 							</div>
 							<p>If request return's null return error to the template</p>
 
@@ -4883,10 +4988,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_315">
+					<tr id="section_321">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_315">&#182;</a>
+								<a class="pilcrow" href="#section_321">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -4901,10 +5006,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_316">
+					<tr id="section_322">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_316">&#182;</a>
+								<a class="pilcrow" href="#section_322">&#182;</a>
 							</div>
 							<h3><i>This sample will show how to Get Compare Change list for document</i></h3>
 
@@ -4915,10 +5020,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_317">
+					<tr id="section_323">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_317">&#182;</a>
+								<a class="pilcrow" href="#section_323">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -4929,10 +5034,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_318">
+					<tr id="section_324">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_318">&#182;</a>
+								<a class="pilcrow" href="#section_324">&#182;</a>
 							</div>
 							<h3>Set variables and get POST data</h3>
 
@@ -4945,10 +5050,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_319">
+					<tr id="section_325">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_319">&#182;</a>
+								<a class="pilcrow" href="#section_325">&#182;</a>
 							</div>
 							<p>Set entered data to the results list</p>
 
@@ -4961,10 +5066,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_320">
+					<tr id="section_326">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_320">&#182;</a>
+								<a class="pilcrow" href="#section_326">&#182;</a>
 							</div>
 							<p>Check is all needed fields are entered</p>
 
@@ -4975,10 +5080,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_321">
+					<tr id="section_327">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_321">&#182;</a>
+								<a class="pilcrow" href="#section_327">&#182;</a>
 							</div>
 							<p>If not all fields entered send error message</p>
 
@@ -4994,10 +5099,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_322">
+					<tr id="section_328">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_322">&#182;</a>
+								<a class="pilcrow" href="#section_328">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -5007,10 +5112,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_323">
+					<tr id="section_329">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_323">&#182;</a>
+								<a class="pilcrow" href="#section_329">&#182;</a>
 							</div>
 							<h3>Make request to ComparisonApi using user id</h3>
 
@@ -5031,10 +5136,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_324">
+					<tr id="section_330">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_324">&#182;</a>
+								<a class="pilcrow" href="#section_330">&#182;</a>
 							</div>
 							<h3>Create table with changes for template</h3>
 
@@ -5045,10 +5150,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_325">
+					<tr id="section_331">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_325">&#182;</a>
+								<a class="pilcrow" href="#section_331">&#182;</a>
 							</div>
 							<p>Count of iterations                                </p>
 
@@ -5058,10 +5163,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_326">
+					<tr id="section_332">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_326">&#182;</a>
+								<a class="pilcrow" href="#section_332">&#182;</a>
 							</div>
 							<h3>Check received data</h3>
 
@@ -5099,10 +5204,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_327">
+					<tr id="section_333">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_327">&#182;</a>
+								<a class="pilcrow" href="#section_333">&#182;</a>
 							</div>
 							<p>Formation of a body of the table</p>
 
@@ -5121,10 +5226,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_328">
+					<tr id="section_334">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_328">&#182;</a>
+								<a class="pilcrow" href="#section_334">&#182;</a>
 							</div>
 							<p>Convert string to HTML string</p>
 
@@ -5134,10 +5239,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_329">
+					<tr id="section_335">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_329">&#182;</a>
+								<a class="pilcrow" href="#section_335">&#182;</a>
 							</div>
 							<p>Return table to the template</p>
 
@@ -5149,10 +5254,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_330">
+					<tr id="section_336">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_330">&#182;</a>
+								<a class="pilcrow" href="#section_336">&#182;</a>
 							</div>
 							<p>If request return's null return error to the template</p>
 
@@ -5170,10 +5275,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_331">
+					<tr id="section_337">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_331">&#182;</a>
+								<a class="pilcrow" href="#section_337">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -5188,10 +5293,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_332">
+					<tr id="section_338">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_332">&#182;</a>
+								<a class="pilcrow" href="#section_338">&#182;</a>
 							</div>
 							<h3><i>This sample will show how to use StorageApi to Create and Upload Envelop to GroupDocs account</i></h3>
 
@@ -5202,10 +5307,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_333">
+					<tr id="section_339">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_333">&#182;</a>
+								<a class="pilcrow" href="#section_339">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -5216,10 +5321,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_334">
+					<tr id="section_340">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_334">&#182;</a>
+								<a class="pilcrow" href="#section_340">&#182;</a>
 							</div>
 							<h3>Set variables and get POST data</h3>
 
@@ -5237,10 +5342,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_335">
+					<tr id="section_341">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_335">&#182;</a>
+								<a class="pilcrow" href="#section_341">&#182;</a>
 							</div>
 							<p>Set entered data to the results list</p>
 
@@ -5257,10 +5362,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_336">
+					<tr id="section_342">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_336">&#182;</a>
+								<a class="pilcrow" href="#section_342">&#182;</a>
 							</div>
 							<p>Check is all needed fields are entered</p>
 
@@ -5271,10 +5376,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_337">
+					<tr id="section_343">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_337">&#182;</a>
+								<a class="pilcrow" href="#section_343">&#182;</a>
 							</div>
 							<p>If not all fields entered send error message</p>
 
@@ -5290,10 +5395,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_338">
+					<tr id="section_344">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_338">&#182;</a>
+								<a class="pilcrow" href="#section_344">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -5303,10 +5408,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_339">
+					<tr id="section_345">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_339">&#182;</a>
+								<a class="pilcrow" href="#section_345">&#182;</a>
 							</div>
 							<p>Upload file for envelop</p>
 
@@ -5316,10 +5421,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_340">
+					<tr id="section_346">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_340">&#182;</a>
+								<a class="pilcrow" href="#section_346">&#182;</a>
 							</div>
 							<p>Check is file uploaded</p>
 
@@ -5330,10 +5435,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_341">
+					<tr id="section_347">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_341">&#182;</a>
+								<a class="pilcrow" href="#section_347">&#182;</a>
 							</div>
 							<p>Create envilope using user id and entered by user name</p>
 
@@ -5346,10 +5451,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_342">
+					<tr id="section_348">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_342">&#182;</a>
+								<a class="pilcrow" href="#section_348">&#182;</a>
 							</div>
 							<p>Get role list for curent user</p>
 
@@ -5360,10 +5465,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_343">
+					<tr id="section_349">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_343">&#182;</a>
+								<a class="pilcrow" href="#section_349">&#182;</a>
 							</div>
 							<p>Get id of role which can sign</p>
 
@@ -5380,10 +5485,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_344">
+					<tr id="section_350">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_344">&#182;</a>
+								<a class="pilcrow" href="#section_350">&#182;</a>
 							</div>
 							<p>Add recipient to envelope</p>
 
@@ -5393,10 +5498,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_345">
+					<tr id="section_351">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_345">&#182;</a>
+								<a class="pilcrow" href="#section_351">&#182;</a>
 							</div>
 							<p>Send envelop with callback url</p>
 
@@ -5406,10 +5511,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_346">
+					<tr id="section_352">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_346">&#182;</a>
+								<a class="pilcrow" href="#section_352">&#182;</a>
 							</div>
 							<p>Check is envelope send status</p>
 
@@ -5420,10 +5525,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_347">
+					<tr id="section_353">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_347">&#182;</a>
+								<a class="pilcrow" href="#section_353">&#182;</a>
 							</div>
 							<p>Set data for template</p>
 
@@ -5436,10 +5541,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_348">
+					<tr id="section_354">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_348">&#182;</a>
+								<a class="pilcrow" href="#section_354">&#182;</a>
 							</div>
 							<p>If status failed set error for template</p>
 
@@ -5455,10 +5560,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_349">
+					<tr id="section_355">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_349">&#182;</a>
+								<a class="pilcrow" href="#section_355">&#182;</a>
 							</div>
 							<p>If envelope wasn't created send error</p>
 
@@ -5473,10 +5578,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_350">
+					<tr id="section_356">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_350">&#182;</a>
+								<a class="pilcrow" href="#section_356">&#182;</a>
 							</div>
 							<p>If request return's null return error to the template</p>
 
@@ -5494,10 +5599,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_351">
+					<tr id="section_357">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_351">&#182;</a>
+								<a class="pilcrow" href="#section_357">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -5512,10 +5617,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_352">
+					<tr id="section_358">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_352">&#182;</a>
+								<a class="pilcrow" href="#section_358">&#182;</a>
 							</div>
 							<h3><i>This sample will show how create or update user and add him to collaborators</i></h3>
 
@@ -5526,10 +5631,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_353">
+					<tr id="section_359">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_353">&#182;</a>
+								<a class="pilcrow" href="#section_359">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -5540,10 +5645,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_354">
+					<tr id="section_360">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_354">&#182;</a>
+								<a class="pilcrow" href="#section_360">&#182;</a>
 							</div>
 							<h3>Set variables and get POST data</h3>
 
@@ -5561,10 +5666,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_355">
+					<tr id="section_361">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_355">&#182;</a>
+								<a class="pilcrow" href="#section_361">&#182;</a>
 							</div>
 							<p>Set entered data to the results list</p>
 
@@ -5582,10 +5687,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_356">
+					<tr id="section_362">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_356">&#182;</a>
+								<a class="pilcrow" href="#section_362">&#182;</a>
 							</div>
 							<p>Check is all needed fields are entered</p>
 
@@ -5596,10 +5701,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_357">
+					<tr id="section_363">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_357">&#182;</a>
+								<a class="pilcrow" href="#section_363">&#182;</a>
 							</div>
 							<p>If not all fields entered send error message</p>
 
@@ -5615,10 +5720,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_358">
+					<tr id="section_364">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_358">&#182;</a>
+								<a class="pilcrow" href="#section_364">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -5628,10 +5733,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_359">
+					<tr id="section_365">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_359">&#182;</a>
+								<a class="pilcrow" href="#section_365">&#182;</a>
 							</div>
 							<p>Create User info object</p>
 
@@ -5641,10 +5746,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_360">
+					<tr id="section_366">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_360">&#182;</a>
+								<a class="pilcrow" href="#section_366">&#182;</a>
 							</div>
 							<p>Create Role info object</p>
 
@@ -5654,10 +5759,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_361">
+					<tr id="section_367">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_361">&#182;</a>
+								<a class="pilcrow" href="#section_367">&#182;</a>
 							</div>
 							<p>Create array of roles.</p>
 
@@ -5667,10 +5772,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_362">
+					<tr id="section_368">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_362">&#182;</a>
+								<a class="pilcrow" href="#section_368">&#182;</a>
 							</div>
 							<p>Set user role Id. Can be: 1 -  SysAdmin, 2 - Admin, 3 - User, 4 - Guest</p>
 
@@ -5680,10 +5785,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_363">
+					<tr id="section_369">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_363">&#182;</a>
+								<a class="pilcrow" href="#section_369">&#182;</a>
 							</div>
 							<p>Set user role name. Can be: SysAdmin, Admin, User, Guest</p>
 
@@ -5694,10 +5799,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_364">
+					<tr id="section_370">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_364">&#182;</a>
+								<a class="pilcrow" href="#section_370">&#182;</a>
 							</div>
 							<p>Set nick name as entered first name</p>
 
@@ -5707,10 +5812,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_365">
+					<tr id="section_371">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_365">&#182;</a>
+								<a class="pilcrow" href="#section_371">&#182;</a>
 							</div>
 							<p>Set first name as entered first name</p>
 
@@ -5720,10 +5825,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_366">
+					<tr id="section_372">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_366">&#182;</a>
+								<a class="pilcrow" href="#section_372">&#182;</a>
 							</div>
 							<p>Set last name as entered last name</p>
 
@@ -5734,10 +5839,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_367">
+					<tr id="section_373">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_367">&#182;</a>
+								<a class="pilcrow" href="#section_373">&#182;</a>
 							</div>
 							<p>Set email as entered email</p>
 
@@ -5747,10 +5852,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_368">
+					<tr id="section_374">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_368">&#182;</a>
+								<a class="pilcrow" href="#section_374">&#182;</a>
 							</div>
 							<p>Creating of new User user - object with new user info</p>
 
@@ -5760,10 +5865,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_369">
+					<tr id="section_375">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_369">&#182;</a>
+								<a class="pilcrow" href="#section_375">&#182;</a>
 							</div>
 							<p>If request return's null return error to the template</p>
 
@@ -5774,10 +5879,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_370">
+					<tr id="section_376">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_370">&#182;</a>
+								<a class="pilcrow" href="#section_376">&#182;</a>
 							</div>
 							<p>Create array with entered email for SetAnnotationCollaborators method </p>
 
@@ -5788,10 +5893,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_371">
+					<tr id="section_377">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_371">&#182;</a>
+								<a class="pilcrow" href="#section_377">&#182;</a>
 							</div>
 							<p>Make request to Ant api for set new user as annotation collaborator</p>
 
@@ -5803,10 +5908,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_372">
+					<tr id="section_378">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_372">&#182;</a>
+								<a class="pilcrow" href="#section_378">&#182;</a>
 							</div>
 							<p>Set reviewers rights for new user.</p>
 
@@ -5816,10 +5921,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_373">
+					<tr id="section_379">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_373">&#182;</a>
+								<a class="pilcrow" href="#section_379">&#182;</a>
 							</div>
 							<p>Make request to Annotation api to set CallBack session</p>
 
@@ -5829,10 +5934,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_374">
+					<tr id="section_380">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_374">&#182;</a>
+								<a class="pilcrow" href="#section_380">&#182;</a>
 							</div>
 							<p>Return GuId of new User to the template</p>
 
@@ -5844,10 +5949,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_375">
+					<tr id="section_381">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_375">&#182;</a>
+								<a class="pilcrow" href="#section_381">&#182;</a>
 							</div>
 							<p>If Collaborators is empty return error</p>
 
@@ -5862,10 +5967,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_376">
+					<tr id="section_382">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_376">&#182;</a>
+								<a class="pilcrow" href="#section_382">&#182;</a>
 							</div>
 							<p>If upload file returns faile, return error to the template</p>
 
@@ -5883,10 +5988,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_377">
+					<tr id="section_383">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_377">&#182;</a>
+								<a class="pilcrow" href="#section_383">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -5901,10 +6006,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_378">
+					<tr id="section_384">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_378">&#182;</a>
+								<a class="pilcrow" href="#section_384">&#182;</a>
 							</div>
 							<h3><i>This sample will show how to use <b>GuId</b> of file to generate an embedded Viewer URL for a Document</i></h3>
 
@@ -5915,10 +6020,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_379">
+					<tr id="section_385">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_379">&#182;</a>
+								<a class="pilcrow" href="#section_385">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -5929,10 +6034,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_380">
+					<tr id="section_386">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_380">&#182;</a>
+								<a class="pilcrow" href="#section_386">&#182;</a>
 							</div>
 							<h3>Set variables and get POST data</h3>
 
@@ -5946,10 +6051,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_381">
+					<tr id="section_387">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_381">&#182;</a>
+								<a class="pilcrow" href="#section_387">&#182;</a>
 							</div>
 							<p>Set entered data to the results list</p>
 
@@ -5962,10 +6067,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_382">
+					<tr id="section_388">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_382">&#182;</a>
+								<a class="pilcrow" href="#section_388">&#182;</a>
 							</div>
 							<p>Check is all needed fields are entered</p>
 
@@ -5976,10 +6081,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_383">
+					<tr id="section_389">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_383">&#182;</a>
+								<a class="pilcrow" href="#section_389">&#182;</a>
 							</div>
 							<p>If not all fields entered send error message</p>
 
@@ -5995,10 +6100,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_384">
+					<tr id="section_390">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_384">&#182;</a>
+								<a class="pilcrow" href="#section_390">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -6008,10 +6113,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_385">
+					<tr id="section_391">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_385">&#182;</a>
+								<a class="pilcrow" href="#section_391">&#182;</a>
 							</div>
 							<p>Make request to get document pages as images</p>
 
@@ -6023,10 +6128,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_386">
+					<tr id="section_392">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_386">&#182;</a>
+								<a class="pilcrow" href="#section_392">&#182;</a>
 							</div>
 							<p>Return page images GuId to the template</p>
 
@@ -6038,10 +6143,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_387">
+					<tr id="section_393">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_387">&#182;</a>
+								<a class="pilcrow" href="#section_393">&#182;</a>
 							</div>
 							<p>If request return empty GuId set error for template</p>
 
@@ -6059,10 +6164,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_388">
+					<tr id="section_394">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_388">&#182;</a>
+								<a class="pilcrow" href="#section_394">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -6077,10 +6182,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_389">
+					<tr id="section_395">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_389">&#182;</a>
+								<a class="pilcrow" href="#section_395">&#182;</a>
 							</div>
 							<h3><i>This sample will show how to use <b>Upload</b> method from Storage Api to upload file to GroupDocs Storage </i></h3>
 
@@ -6091,10 +6196,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_390">
+					<tr id="section_396">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_390">&#182;</a>
+								<a class="pilcrow" href="#section_396">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -6105,10 +6210,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_391">
+					<tr id="section_397">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_391">&#182;</a>
+								<a class="pilcrow" href="#section_397">&#182;</a>
 							</div>
 							<h3>Set variables and get POST data</h3>
 
@@ -6121,10 +6226,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_392">
+					<tr id="section_398">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_392">&#182;</a>
+								<a class="pilcrow" href="#section_398">&#182;</a>
 							</div>
 							<p>Set entered data to the results list</p>
 
@@ -6137,10 +6242,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_393">
+					<tr id="section_399">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_393">&#182;</a>
+								<a class="pilcrow" href="#section_399">&#182;</a>
 							</div>
 							<p>Check is all needed fields are entered</p>
 
@@ -6151,10 +6256,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_394">
+					<tr id="section_400">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_394">&#182;</a>
+								<a class="pilcrow" href="#section_400">&#182;</a>
 							</div>
 							<p>If not all fields entered send error message</p>
 
@@ -6170,10 +6275,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_395">
+					<tr id="section_401">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_395">&#182;</a>
+								<a class="pilcrow" href="#section_401">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -6183,10 +6288,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_396">
+					<tr id="section_402">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_396">&#182;</a>
+								<a class="pilcrow" href="#section_402">&#182;</a>
 							</div>
 							<p>Make request to upload file from entered Url</p>
 
@@ -6198,10 +6303,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_397">
+					<tr id="section_403">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_397">&#182;</a>
+								<a class="pilcrow" href="#section_403">&#182;</a>
 							</div>
 							<p>If file uploaded return his GuId to template</p>
 
@@ -6213,10 +6318,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_398">
+					<tr id="section_404">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_398">&#182;</a>
+								<a class="pilcrow" href="#section_404">&#182;</a>
 							</div>
 							<p>If file wasn't uploaded return error</p>
 
@@ -6234,10 +6339,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_399">
+					<tr id="section_405">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_399">&#182;</a>
+								<a class="pilcrow" href="#section_405">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -6251,10 +6356,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_400">
+					<tr id="section_406">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_400">&#182;</a>
+								<a class="pilcrow" href="#section_406">&#182;</a>
 							</div>
 							<h3>Callback check for Sample19</h3>
 
@@ -6265,10 +6370,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_401">
+					<tr id="section_407">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_401">&#182;</a>
+								<a class="pilcrow" href="#section_407">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -6279,10 +6384,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_402">
+					<tr id="section_408">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_402">&#182;</a>
+								<a class="pilcrow" href="#section_408">&#182;</a>
 							</div>
 							<p>Create txt file and write all resived from server data to this file</p>
 
@@ -6297,10 +6402,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_403">
+					<tr id="section_409">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_403">&#182;</a>
+								<a class="pilcrow" href="#section_409">&#182;</a>
 							</div>
 							<p>Read all strings from file for template</p>
 
@@ -6312,10 +6417,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_404">
+					<tr id="section_410">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_404">&#182;</a>
+								<a class="pilcrow" href="#section_410">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -6329,10 +6434,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_405">
+					<tr id="section_411">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_405">&#182;</a>
+								<a class="pilcrow" href="#section_411">&#182;</a>
 							</div>
 							<h3>Callback check for Sample21</h3>
 
@@ -6343,10 +6448,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_406">
+					<tr id="section_412">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_406">&#182;</a>
+								<a class="pilcrow" href="#section_412">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -6357,10 +6462,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_407">
+					<tr id="section_413">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_407">&#182;</a>
+								<a class="pilcrow" href="#section_413">&#182;</a>
 							</div>
 							<p>Create txt file and write all resived from server data to this file</p>
 
@@ -6375,10 +6480,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_408">
+					<tr id="section_414">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_408">&#182;</a>
+								<a class="pilcrow" href="#section_414">&#182;</a>
 							</div>
 							<p>Read all strings from file for template</p>
 
@@ -6390,10 +6495,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_409">
+					<tr id="section_415">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_409">&#182;</a>
+								<a class="pilcrow" href="#section_415">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -6407,10 +6512,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_410">
+					<tr id="section_416">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_410">&#182;</a>
+								<a class="pilcrow" href="#section_416">&#182;</a>
 							</div>
 							<h3>Callback check for Sample22</h3>
 
@@ -6421,10 +6526,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_411">
+					<tr id="section_417">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_411">&#182;</a>
+								<a class="pilcrow" href="#section_417">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -6435,10 +6540,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_412">
+					<tr id="section_418">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_412">&#182;</a>
+								<a class="pilcrow" href="#section_418">&#182;</a>
 							</div>
 							<p>Create txt file and write all resived from server data to this file</p>
 
@@ -6453,10 +6558,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_413">
+					<tr id="section_419">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_413">&#182;</a>
+								<a class="pilcrow" href="#section_419">&#182;</a>
 							</div>
 							<p>Read all strings from file for template</p>
 
@@ -6468,10 +6573,10 @@ Pass GUID of the document as model.</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_414">
+					<tr id="section_420">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_414">&#182;</a>
+								<a class="pilcrow" href="#section_420">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 

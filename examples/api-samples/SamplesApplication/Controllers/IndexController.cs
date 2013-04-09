@@ -1273,6 +1273,8 @@ namespace SamplesApp.Controllers
                 String private_key = Request.Form["private_key"];
                 String fileId = Request.Form["fileId"];
                 String type = Request.Form["convert_type"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
                 String callback = Request.Form["callback"];
                 // Set entered data to the results list
                 result.Add("client_id", userId);
@@ -1293,16 +1295,51 @@ namespace SamplesApp.Controllers
                     
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    if (url != "")
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //If file uploaded return his GuId
+                            fileId = guid;
+
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample18", null, result);
+                        }
+                    }
+                    else if (file != null)
+                    {
+                        //Upload local file 
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        if (upload.Guid != null)
+                        {
+                            //If file uploaded return his guid
+                            fileId = upload.Guid;
+                        }
+                        else
+                        {
+                            //If file wasn't uploaded return error
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample18", null, result);
+                        }
+                    }
+                   
+                    
                     //Make request to api for convert file
                     decimal jobId = service.ConvertFile(fileId, type, "", false, false, callback);
-                    
+
                     if (jobId != null)
                     {
                         //Delay necessary that the inquiry would manage to be processed
                         System.Threading.Thread.Sleep(5000);
                         //Make request to api for get document info by job id
                         Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
-                        
+
                         if (job.Inputs[0].Outputs[0].Guid != "")
                         {
                             //Return file guid to the template
@@ -1322,7 +1359,9 @@ namespace SamplesApp.Controllers
                         result.Add("error", "Convert is faile");
                         return View("Sample18", null, result);
                     }
-
+                        
+                   
+                   
                 }
 
             }

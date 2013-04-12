@@ -140,6 +140,7 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="downloads\" />
     <Folder Include="Models\" />
     <Folder Include="Views\Samples\temp\" />
   </ItemGroup>
@@ -182,9 +183,6 @@
   <ItemGroup>
     <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <Content Include="obj\Debug\SamplesApp.csprojResolveAssemblyReference.cache" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="downloads\test.doc" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Samples\sample18.cshtml" />
@@ -239,6 +237,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Samples\sample24.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\convert_callback.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

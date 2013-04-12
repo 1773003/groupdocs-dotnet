@@ -187,6 +187,16 @@ namespace SamplesApp
                           "{controller}/{action}/{result}", // URL with parameters
                           new { controller = "Samples", action = "annotation_callback", result = UrlParameter.Optional } // Parameter defaults
                         );
+              routes.MapRoute(
+                            "convert_callback", // Route name
+                            "{controller}/{action}/{result}", // URL with parameters
+                            new { controller = "Samples", action = "convert_callback", result = UrlParameter.Optional } // Parameter defaults
+                          );
+              routes.MapRoute(
+                             "check_file", // Route name
+                             "{controller}/{action}/{result}", // URL with parameters
+                             new { controller = "Samples", action = "check_file", result = UrlParameter.Optional } // Parameter defaults
+                           );
              
         }
 

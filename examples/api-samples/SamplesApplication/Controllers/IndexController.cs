@@ -2,7 +2,9 @@
 using System.Configuration;
 using System.Web.Mvc;
 using Groupdocs.Sdk;
-using Groupdocs.Api; 
+using Groupdocs.Api;
+using System.IO;
+using System.Linq;
 
 namespace SamplesApp.Controllers
 {
@@ -1289,18 +1291,22 @@ namespace SamplesApp.Controllers
                     message = "Please enter all parameters";
                     result.Add("error", message);
                     return View("Sample18", null, result);
-                }
-                else
+                } else
                 {
-                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(AppDomain.CurrentDomain.BaseDirectory + "user_info.txt");
+                    String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(infoFile);
                     if (fileInfo.Exists)
                     {
-                        System.IO.File.Delete(AppDomain.CurrentDomain.BaseDirectory + "user_info.txt");
+                        System.IO.File.Delete(infoFile);
                     }
-                    String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-                    System.IO.StreamWriter w;
-                    w = System.IO.File.CreateText(filePath);
-                    w.WriteLine("userId " + userId + " private_key " + private_key);
+
+                    
+                    FileStream fcreate = System.IO.File.Open(infoFile, FileMode.Create); // will create the file or overwrite it if it already exists
+                    //String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+                    System.IO.StreamWriter w = new StreamWriter(fcreate);
+                    //w = System.IO.File.CreateText(filePath);
+                    w.WriteLine(userId);
+                    w.WriteLine(private_key);
                     w.Flush();
                     w.Close();
                     //Create service for Groupdocs account
@@ -1367,10 +1373,7 @@ namespace SamplesApp.Controllers
                     {
                         result.Add("error", "Convert is faile");
                         return View("Sample18", null, result);
-                    }
-                        
-                   
-                   
+                    }         
                 }
 
             }
@@ -1883,18 +1886,19 @@ namespace SamplesApp.Controllers
         //### Callback check for Sample18
         public ActionResult convert_callback()
         {
+
+            String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+            //String fileInfo = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+
+            //String userInfo = System.IO.File.ReadLines(infoFile);
+            System.IO.StreamReader userInfoFile = new System.IO.StreamReader(infoFile);
+            String userId = userInfoFile.ReadLine();
+            String privateKey = userInfoFile.ReadLine();
+            userInfoFile.Close();
+
             // Check is data posted 
             if (Request.HttpMethod == "POST")
-            {
-                String fileInfo = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-
-                String userInfo = System.IO.File.ReadAllText(fileInfo);
-                String newLine = userInfo.Remove(userInfo.Length - 2);
-                char[] separator = new char[] { ' ' };
-                String[] userData = newLine.Split(separator);
-                String userId = userData[1];
-                String private_key = userData[3];
-
+            {     
                 //Create txt file and write all resived from server data to this file
                 String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt";
                 System.IO.File.Delete(filePath);
@@ -1907,7 +1911,7 @@ namespace SamplesApp.Controllers
                 jobId = jobId.Replace(" ", "");
                 String fileId = "";
                  // Create service for Groupdocs account
-                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
                 //Make request to api for get document info by job id
                 Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
                  String name = "";
@@ -1937,7 +1941,8 @@ namespace SamplesApp.Controllers
             // If data not posted return to template for filling of necessary fields
             else
             {
-                String jobId = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt");
+                String jobId = userId + ":" + privateKey;
+                //String jobId = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt");
                 return View("convert_callback", null, jobId);
 
             }
@@ -1947,57 +1952,28 @@ namespace SamplesApp.Controllers
         {
             // Check is data posted 
                 String result = "";
-                String fileInfo = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-
-                String userInfo = System.IO.File.ReadAllText(fileInfo);
-                String newLine = userInfo.Remove(userInfo.Length - 2);
-                char[] separator = new char[] { ' ' };
-                String[] userData = newLine.Split(separator);
-                String userId = userData[1];
-                String private_key = userData[3];
-
-                System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream);
-                String jsonString = reader.ReadToEnd();
-                var data = System.Web.Helpers.Json.Decode(jsonString);
-                String jobId = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt");
-                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                // Definition of folder where to download file
+                
                 String LocalPath = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
-                if (jobId != "")
-                {
-
-
-                    //Make request to api for get document info by job id
-                    Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
-                    String name = job.Inputs[0].Outputs[0].Name;
-                    if (name != "")
-                    {
-                        Boolean check = false;
                         do
                         {
-                            System.IO.FileInfo checkFile = new System.IO.FileInfo(LocalPath + name);
                             System.Threading.Thread.Sleep(5000);
-                            if (checkFile.Exists)
+                            string[] filePaths = Directory.GetFiles(@LocalPath).Select(Path.GetFileName).ToArray();
+                            if (filePaths.Length == 0)
                             {
-                                check = true;
-
+                                continue;
                             }
+                            else
+                            {
+                                result = filePaths[0];
+                                break;
+                            }
+                           
 
                         }
-                        while (check != true);
-                        result = "<a href='/downloads/" + name + "'>Converted file</a>";
+                        while (true);
+                        result = "<a href='/downloads/" + result + "'>Converted file</a>";
                         MvcHtmlString link = MvcHtmlString.Create(result);
                         return result;
-                    }
-                    else
-                    {
-                        return "error";
-                    }
-                }
-                else
-                {
-                    return "jobId is empty";
-                }
             }
 
         //### Callback check for Sample19

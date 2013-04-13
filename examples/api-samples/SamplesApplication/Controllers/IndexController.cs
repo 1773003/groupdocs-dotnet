@@ -1272,7 +1272,7 @@ namespace SamplesApp.Controllers
                 //### Set variables and get POST data
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
-                String private_key = Request.Form["private_key"];
+                String privateKey = Request.Form["private_key"];
                 String fileId = Request.Form["fileId"];
                 String type = Request.Form["convert_type"];
                 String url = Request.Form["url"];
@@ -1280,12 +1280,12 @@ namespace SamplesApp.Controllers
                 String callback = Request.Form["callback"];
                 // Set entered data to the results list
                 result.Add("client_id", userId);
-                result.Add("private_key", private_key);
+                result.Add("private_key", privateKey);
                 result.Add("fileId", fileId);
                 result.Add("type", type);
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || fileId == null || type == null)
+                if (userId == null || privateKey == null || fileId == null || type == null)
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -1293,24 +1293,27 @@ namespace SamplesApp.Controllers
                     return View("Sample18", null, result);
                 } else
                 {
+                    //path to settings file - temporary same userId and apiKey like to property file
                     String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(infoFile);
-                    if (fileInfo.Exists)
-                    {
-                        System.IO.File.Delete(infoFile);
-                    }
-
                     
+                    //open file in rewrite mode
                     FileStream fcreate = System.IO.File.Open(infoFile, FileMode.Create); // will create the file or overwrite it if it already exists
                     //String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
                     System.IO.StreamWriter w = new StreamWriter(fcreate);
                     //w = System.IO.File.CreateText(filePath);
-                    w.WriteLine(userId);
-                    w.WriteLine(private_key);
+                    w.WriteLine(userId); //save userId
+                    w.WriteLine(privateKey); //save privateKey
                     w.Flush();
                     w.Close();
+
+                    String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                    if (Directory.Exists(downloadFolder))
+                    {
+                        Directory.Delete(downloadFolder, true);
+                    }
+
                     //Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
                     if (url != "")
                     {
                         //Make request to upload file from entered Url
@@ -1899,9 +1902,6 @@ namespace SamplesApp.Controllers
             // Check is data posted 
             if (Request.HttpMethod == "POST")
             {     
-                //Create txt file and write all resived from server data to this file
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt";
-                System.IO.File.Delete(filePath);
                 System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream);
                 String jsonString = reader.ReadToEnd();
 
@@ -1924,18 +1924,17 @@ namespace SamplesApp.Controllers
                 
 
                 // Definition of folder where to download file
-                String LocalPath = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+
+                if (!Directory.Exists(downloadFolder))
+                {
+                    DirectoryInfo di = Directory.CreateDirectory(downloadFolder);
+                }
+
                 //### Make a request to Storage Api for dowloading file
                 // Download file
-                bool file = service.DownloadFile(fileId, LocalPath + name);
-                if (file == true)
-                {
-                    System.IO.StreamWriter w;
-                    w = System.IO.File.CreateText(filePath);
-                    w.WriteLine(jobId);
-                    w.Flush();
-                    w.Close();
-                }
+                bool file = service.DownloadFile(fileId, downloadFolder + name);
+
                 return View("convert_callback");
             }
             // If data not posted return to template for filling of necessary fields
@@ -1957,7 +1956,11 @@ namespace SamplesApp.Controllers
                         do
                         {
                             System.Threading.Thread.Sleep(5000);
-                            string[] filePaths = Directory.GetFiles(@LocalPath).Select(Path.GetFileName).ToArray();
+                            if (!Directory.Exists(LocalPath))
+                            {
+                                DirectoryInfo di = Directory.CreateDirectory(LocalPath);
+                            }
+                            string[] filePaths = Directory.GetFiles(LocalPath).Select(Path.GetFileName).ToArray();
                             if (filePaths.Length == 0)
                             {
                                 continue;

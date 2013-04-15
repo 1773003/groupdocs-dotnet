@@ -61,27 +61,28 @@
         <label for='file' id="file" style="display:none;">Upload local file</label>
         <br />
         <input type='file' name='file' id="filefield" style="display:none;" />
-        
         <br />
-        <label for='private_key'>Callback URL <span class="optional">(Optional)</span><br /><font color="grey">(For test Callback you can use this URL: http://groupdocs-dotnet-samples.apphb.com/samples/convert_callback)</font></label>
-        <br />
-       
-        if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"]))) 
-        {
-            <input type='text', name='callback'  value="@Model["callback"]" size="70" />
-        }
-        else 
-        {
-            <input type='text', name='callback'  value="" size="70" />
-        }
-        <br />
-       <label for='convert_type'>Result file type</label>
+        <label for='convert_type'>Result file type</label>
         <select name="convert_type" id="convert_type">
                             <option value="doc">Doc</option>
                             <option value="pdf">PDF</option>
                             <option value="docx">Docx</option>
                             <option value="ppt">PPT</option>
+                            <option value="txt">TXT</option>
         </select>
+        <br />
+        <br />
+        <label for='private_key'>Callback URL <span class="optional">(Optional)</span><br /><font color="grey">(For test Callback you can use this URL: http://groupdocs-dotnet-samples.apphb.com/samples/convert_callback)</font></label>
+        <br />
+       
+       if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"])))
+       {
+            <input type='text', name='callback'  value="@Model["callback"]" size="70" />
+       }
+       else
+       {
+            <input type='text', name='callback'  value="" size="70" />
+       }
         <br />
         <input type='submit' value='Make Request' id="btn"/>
         <span id="results_status" style="color:red;display:none;"> (Please wait for ajax response) </span>

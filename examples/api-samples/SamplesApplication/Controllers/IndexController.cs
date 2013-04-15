@@ -1291,7 +1291,8 @@ namespace SamplesApp.Controllers
 
                 String message = null;
                 // Check is all required fields were provided
-                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(privateKey)|| String.IsNullOrEmpty(fileId) || String.IsNullOrEmpty(type))
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(privateKey) || String.IsNullOrEmpty(type)
+                    || (String.IsNullOrEmpty(fileId) && (String.IsNullOrEmpty(url)) && (file.ContentLength == 0)))
                 {
                     // If not all required fields were provided - send error message
                     message = "Please enter all parameters";

@@ -91,6 +91,8 @@
         <br />
         <a href="http://groupdocs-php-samples.herokuapp.com/templates/base-simple_source.html">Download sample HTML file 2</a>
         <br />
+
+        <iframe id="downloadframe" style="display:none"></iframe>
     
         @if (Model != null)
         {
@@ -127,9 +129,10 @@
                      success: function (data) {
                          $('#results_status').fadeOut("slow");
                          div = document.getElementById("link");
-                         a = document.createElement("p");
-                         a.innerHTML = "<br />" + data;
-                         div.appendChild(a);
+                         p = document.createElement("p");
+                         p.innerHTML = "<br /> File " + data + " was downloaded.";
+                         div.appendChild(p);
+                         $("#downloadframe").attr("src", "/Samples/download_file?FileName=" + data);
                      },
                      dataType: "text"
                  });

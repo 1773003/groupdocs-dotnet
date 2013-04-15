@@ -2012,8 +2012,9 @@ namespace SamplesApp.Controllers
                         }
 
                         //form the link to result file
-                        result = "<a href='/downloads/" + result + "'>Converted file</a>";
-                        return result;
+                        //result = "<a href='/downloads/" + result + "'>Converted file</a>";
+
+                        return result; //return only file name of the result file
             }
 
         //### Callback check for Sample19
@@ -2091,6 +2092,18 @@ namespace SamplesApp.Controllers
                 String r = System.IO.File.ReadAllText(filePath);
                 return View("annotation_callback");
             }
+        }
+
+
+        // Method for file downloading from JS
+        public void download_file() {
+            string fileName = Request.QueryString["FileName"];
+            string documentPath = string.Format("{0}downloads/{1}", AppDomain.CurrentDomain.BaseDirectory, fileName);
+
+            Response.AddHeader("Content-disposition", "attachment; filename=" + fileName);
+            Response.ContentType = "application/octet-stream";
+            Response.WriteFile(documentPath);
+            Response.End();
         }
 
     }

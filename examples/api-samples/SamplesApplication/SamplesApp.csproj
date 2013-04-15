@@ -47,9 +47,8 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.4.1.10331.0\lib\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Groupdocs.Api.Comparison.Contract, Version=2.1.134.5771, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Groupdocs.Api.Comparison.Contract.dll</HintPath>
+    <Reference Include="Groupdocs.Api.Comparison.Contract">
+      <HintPath>..\..\..\Groupdocs.Api.Comparison.Contract.dll</HintPath>
     </Reference>
     <Reference Include="Groupdocs.Api.Contract">
       <HintPath>..\lib\Groupdocs.Api.Contract.dll</HintPath>
@@ -66,11 +65,17 @@
     <Reference Include="Groupdocs.Sdk">
       <HintPath>..\lib\Groupdocs.Sdk.dll</HintPath>
     </Reference>
+    <Reference Include="Groupdocs.Security">
+      <HintPath>..\..\..\Groupdocs.Security.dll</HintPath>
+    </Reference>
     <Reference Include="Groupdocs.Swagger">
       <HintPath>..\lib\Groupdocs.Swagger.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Http">
       <HintPath>..\lib\Microsoft.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -123,6 +128,8 @@
     <Content Include="docs\nocco.css" />
     <Content Include="docs\prettify.js" />
     <Content Include="Global.asax" />
+    <Content Include="images\help.png" />
+    <Content Include="images\info.png" />
     <Content Include="obj\Debug\SamplesApp.csproj.FileListAbsolute.txt" />
     <Content Include="obj\Debug\SamplesApp.dll" />
     <Content Include="obj\Debug\SamplesApp.pdb" />

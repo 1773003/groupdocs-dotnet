@@ -9,12 +9,14 @@
 
 </head>
 <body>
-<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample18</h3>
+
+<h3><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample18</h3>
 
 <div class='samplecontent' style="padding:10px;">
-   <i>This sample will show how to convert Doc to Docx, Docx to Doc, Docx and DOC to PDF and PPT to PDF, HTML to DOC and DOCX using .NET SDK</i> <br/>
-   <br />
-   <a href="/docs/controllers/indexcontroller.html#section_285">Docs for this sample</a>
+    <p>Description:</p> 
+    <span class="description"> <i>This sample will show how to use <b>ConvertFile</b> method to convert Doc to Docx, Docx to Doc, Docx and DOC to PDF and PPT to PDF, HTML to DOC and DOCX using GroupDocs .NET SDK</i>. When you use optional parameter "Callback URL" - additional logic will be involved: POST request from GroupDocs API server will be handled by convert_callback action. Also from result page an AJAX request will be sent to backend to check if callback was handled and result file was downloaded. If yes, then AJAX request will return a link to the file.</span> <br/>
+    <br />
+    <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_285">Builtin documentation for this sample</a></span>
    <br />
    <br/><p>You entered:
 @if (Model != null) {
@@ -23,6 +25,7 @@
            <p>PrivateKey = @Model["private_key"]</p>
            <p>File Id = @Model["fileId"]</p>
            <p>Convert type = @Model["type"]</p>
+           <p>Callback URL = @Model["callback"]</p>
            <p><font color="red">@Model["error"]</font></p>
       
 }
@@ -60,9 +63,17 @@
         <input type='file' name='file' id="filefield" style="display:none;" />
         
         <br />
-        <label for='private_key'>Callback URL <br /><font color="grey">(For test Callback you can use this URL:groupdocs-dotnet-samples.apphb.com/samples/convert_callback Optional)</font></label>
+        <label for='private_key'>Callback URL <span class="optional">(Optional)</span><br /><font color="grey">(For test Callback you can use this URL: http://groupdocs-dotnet-samples.apphb.com/samples/convert_callback)</font></label>
         <br />
-        <input type='text', name='callback'  value="" />
+       
+        if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"]))) 
+        {
+            <input type='text', name='callback'  value="@Model["callback"]" size="70" />
+        }
+        else 
+        {
+            <input type='text', name='callback'  value="" size="70" />
+        }
         <br />
         <select name="convert_type" id="convert_type">
                             <option value="doc">Doc</option>
@@ -77,8 +88,9 @@
    }
         <br />
         <a href="http://groupdocs-php-samples.herokuapp.com/templates/testdocument.html">Download sample HTML file 1</a> 
-       <br />
+        <br />
         <a href="http://groupdocs-php-samples.herokuapp.com/templates/base-simple_source.html">Download sample HTML file 2</a>
+        <br />
     
         @if (Model != null)
         {
@@ -106,7 +118,7 @@
             
          function check() {
              
-             if (document.getElementById("result") != null) {
+             if (($("input[name=callback]").val() != "") && (document.getElementById("result") != null)) {
                  $('#results_status').fadeIn("slow");
                  form = document.forms.form;
                  $.ajax({

@@ -1283,37 +1283,47 @@ namespace SamplesApp.Controllers
                 result.Add("private_key", privateKey);
                 result.Add("fileId", fileId);
                 result.Add("type", type);
-                String message = null;
-                // Check is all needed fields are entered
-                if (userId == null || privateKey == null || fileId == null || type == null)
+
+                if (!String.IsNullOrEmpty(callback))
                 {
-                    // If not all fields entered send error message
+                    result.Add("callback", callback);
+                }
+
+                String message = null;
+                // Check is all required fields were provided
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(privateKey)|| String.IsNullOrEmpty(fileId) || String.IsNullOrEmpty(type))
+                {
+                    // If not all required fields were provided - send error message
                     message = "Please enter all parameters";
                     result.Add("error", message);
                     return View("Sample18", null, result);
-                } else
+                }
+                else
                 {
-                    //path to settings file - temporary same userId and apiKey like to property file
+                    //path to settings file - temporary save userId and apiKey like to property file
                     String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
                     
                     //open file in rewrite mode
                     FileStream fcreate = System.IO.File.Open(infoFile, FileMode.Create); // will create the file or overwrite it if it already exists
                     //String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-                    System.IO.StreamWriter w = new StreamWriter(fcreate);
+                    System.IO.StreamWriter infoFileStreamWriter = new StreamWriter(fcreate);
                     //w = System.IO.File.CreateText(filePath);
-                    w.WriteLine(userId); //save userId
-                    w.WriteLine(privateKey); //save privateKey
-                    w.Flush();
-                    w.Close();
+                    infoFileStreamWriter.WriteLine(userId); //save userId
+                    infoFileStreamWriter.WriteLine(privateKey); //save privateKey
+                    infoFileStreamWriter.Flush();
+                    infoFileStreamWriter.Close();
 
                     String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                    //check if Downloads folder exists and remove it to clean all old files
                     if (Directory.Exists(downloadFolder))
                     {
                         Directory.Delete(downloadFolder, true);
                     }
 
-                    //Create service for Groupdocs account
+                    //Create service (API Client object) linked to provided Groupdocs account
                     GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
+
+                    //if URL to web file was provided - upload the file from Web and get it's GUID
                     if (url != "")
                     {
                         //Make request to upload file from entered Url
@@ -1331,6 +1341,8 @@ namespace SamplesApp.Controllers
                             return View("Sample18", null, result);
                         }
                     }
+
+                    //if file was uploaded locally - upload the file and get it's GUID
                     if (file.FileName != "")
                     {
                         //Upload local file 
@@ -1348,35 +1360,47 @@ namespace SamplesApp.Controllers
                         }
                     }
 
-                    //Make request to api for convert file
-                    decimal jobId = service.ConvertFile(fileId, type, "", false, false, callback);
 
-                    if (jobId != null)
+                    decimal jobId = 0;
+                    try
                     {
-                        //Delay necessary that the inquiry would manage to be processed
-                        System.Threading.Thread.Sleep(5000);
-                        //Make request to api for get document info by job id
-                        Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
-
-                        if (job.Inputs[0].Outputs[0].Guid != "")
-                        {
-                            //Return file guid to the template
-                            result.Add("guid", job.Inputs[0].Outputs[0].Guid);
-                            return View("Sample18", null, result);
-                        }
-                        else
-                        {
-                            //If file GuId is empty return error
-                            result.Add("error", "File GuId is empty");
-                            return View("Sample18", null, result);
-                        }
+                        //Make request to api for convert file.
+                        //@fileId - GUID. Represents the provided file - via guid, web url or local file.
+                        //@type - File type of the result file
+                        //@callback - callback URL
+                        jobId = service.ConvertFile(fileId, type, "", false, false, callback);
                     }
-                    // If request return's null return error to the template
+                    catch (Exception e)
+                    {
+
+                        result.Add("error", e.ToString());
+                        return View("Sample18", null, result);
+                    }
+
+                    /*
+                     * The approack bellow is not good one to get Job Results directly in the code after ConvertFile method.
+                     * We use this approach to show the result file in embedded iframe on the same sample page.
+                     * In production it's better to use Callback approach - this approach allso implemented in this sample. 
+                     */
+
+                    //Delay is required to be shure that the file was processed
+                    System.Threading.Thread.Sleep(5000);
+                    //Make request to api to get document info by job id
+                    Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
+
+                    if (job.Inputs[0].Outputs[0].Guid != "")
+                    {
+                        //Return file guid to the template
+                        result.Add("guid", job.Inputs[0].Outputs[0].Guid);
+                        return View("Sample18", null, result);
+                    }
                     else
                     {
-                        result.Add("error", "Convert is faile");
+                        //If file GuId is empty return error
+                        result.Add("error", "File GuId is empty");
                         return View("Sample18", null, result);
-                    }         
+                    }
+        
                 }
 
             }
@@ -1951,31 +1975,43 @@ namespace SamplesApp.Controllers
         {
             // Check is data posted 
                 String result = "";
-                
+                byte counter = 0; //counter to not wait forever
                 String LocalPath = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
                         do
                         {
+                            if (counter >= 10)
+                            {
+                                result = "Error";
+                                break;
+                            }
                             System.Threading.Thread.Sleep(5000);
+
                             if (!Directory.Exists(LocalPath))
                             {
                                 DirectoryInfo di = Directory.CreateDirectory(LocalPath);
                             }
                             string[] filePaths = Directory.GetFiles(LocalPath).Select(Path.GetFileName).ToArray();
+
                             if (filePaths.Length == 0)
                             {
+                                counter++;
                                 continue;
                             }
                             else
                             {
-                                result = filePaths[0];
+                                result = filePaths[0]; //get the name of the fist file in the directory
                                 break;
                             }
                            
 
+                        } while (true);
+
+                        if (result.Equals("Error")) {
+                            return "File was not found. Looks like something went wrong."; //exit and return error
                         }
-                        while (true);
+
+                        //form the link to result file
                         result = "<a href='/downloads/" + result + "'>Converted file</a>";
-                        MvcHtmlString link = MvcHtmlString.Create(result);
                         return result;
             }
 

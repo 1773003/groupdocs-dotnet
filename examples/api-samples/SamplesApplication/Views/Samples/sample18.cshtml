@@ -9,120 +9,76 @@
 
 </head>
 <body>
-
 <h3><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample18</h3>
-
 <div class='samplecontent' style="padding:10px;">
     <p>Description:</p> 
-    <span class="description"> <i>This sample will show how to use <b>ConvertFile</b> method to convert Doc to Docx, Docx to Doc, Docx and DOC to PDF and PPT to PDF, HTML to DOC and DOCX using GroupDocs .NET SDK</i>. When you use optional parameter "Callback URL" - additional logic will be involved: POST request from GroupDocs API server will be handled by convert_callback action. Also from result page an AJAX request will be sent to backend to check if callback was handled and result file was downloaded. If yes, then AJAX request will return a link to the file.</span> <br/>
-    <br />
-    <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_285">Builtin documentation for this sample</a></span>
-   <br />
-   <br/><p>You entered:
-@if (Model != null) {
- 
-           <p>ClientID = @Model["client_id"]</p>
-           <p>PrivateKey = @Model["private_key"]</p>
-           <p>File Id = @Model["fileId"]</p>
-           <p>Convert type = @Model["type"]</p>
-           <p>Callback URL = @Model["callback"]</p>
-           <p><font color="red">@Model["error"]</font></p>
-      
-}
-   <br/>
+    <span class="description"> <i>This sample will show how to use <b>ConvertFile</b> method to convert Doc to Docx, Docx to Doc, Docx and DOC to PDF and PPT to PDF, HTML to DOC and DOCX using GroupDocs .NET SDK</i>. When you use optional parameter "Callback URL" - additional logic will be involved: POST request from GroupDocs API server will be handled by convert_callback action. Also from result page an AJAX request will be sent to backend to check if callback was handled and result file was downloaded. If yes, then AJAX request will return a link to the file.</span> <br/><br />
+    <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_285">Builtin documentation for this sample</a></span><br /><br/>
+    <p>You entered:
+    @if (Model != null) {
+            <p>ClientID = @Model["client_id"]</p>
+            <p>PrivateKey = @Model["private_key"]</p>
+            <p>File Id = @Model["fileId"]</p>
+            <p>Convert type = @Model["type"]</p>
+            <p>Callback URL = @Model["callback"]</p>
+            <p><font color="red">@Model["error"]</font></p>
+    }<br/>
    <div id="requestForm" style="padding:20px; border:1px solid black;">
    <p> Enter data for request and press "Make request" button </p>
-   @using (Html.BeginForm("sample18", "Samples", FormMethod.Post, new { enctype = "multipart/form-data"}))
-   {
-        <label for='client_id'>GroupDocs Client ID</label>
-        <br />
-        <input type='text', name='client_id' value="" />
-        <br />
-        <label for='private_key'>GroupDocs Private Key</label>
-        <br />
-        <input type='text', name='private_key'  value="" />
-        <br />
-       <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
-        <br />
-        <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
-        <br />
-        <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
-                                                                     <br />
-         
-        <br /> 
-        <label for='private_key' id="guid">File ID (GUID)</label>
-        <br />
+   @using (Html.BeginForm("sample18", "Samples", FormMethod.Post, new { enctype = "multipart/form-data"})){
+        <label for='client_id'>GroupDocs Client ID</label><br />
+        <input type='text', name='client_id' value="" /><br />
+        <label for='private_key'>GroupDocs Private Key</label><br />
+        <input type='text', name='private_key'  value="" /><br />
+        <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input><br />
+        <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input><br />
+        <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input><br /><br /> 
+        <label for='private_key' id="guid">File ID (GUID)</label><br />
         <input type='text', name='fileId' id="guidfield"  value="" />
-        
-        <label for='private_key' style="display:none;" id="url">Upload file from URL</label>
-        <br />
+        <label for='private_key' style="display:none;" id="url">Upload file from URL</label><br />
         <input type='text', name='url'  value="" id="urlfield" style="display:none;" />
-        
-        <label for='file' id="file" style="display:none;">Upload local file</label>
-        <br />
-        <input type='file' name='file' id="filefield" style="display:none;" />
-        <br />
+        <label for='file' id="file" style="display:none;">Upload local file</label><br />
+        <input type='file' name='file' id="filefield" style="display:none;" /><br />
         <label for='convert_type'>Result file type</label>
         <select name="convert_type" id="convert_type">
-                            <option value="doc">Doc</option>
-                            <option value="pdf">PDF</option>
-                            <option value="docx">Docx</option>
-                            <option value="ppt">PPT</option>
-                            <option value="txt">TXT</option>
-        </select>
-        <br />
-        <br />
-        <label for='private_key'>Callback URL <span class="optional">(Optional)</span><br /><font color="grey">(For test Callback you can use this URL: http://groupdocs-dotnet-samples.apphb.com/samples/convert_callback)</font></label>
-        <br />
-       
-       if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"])))
-       {
+            <option value="doc">Doc</option>
+            <option value="pdf">PDF</option>
+            <option value="docx">Docx</option>
+            <option value="ppt">PPT</option>
+            <option value="txt">TXT</option>
+        </select><br /><br />
+        <label for='private_key'>Callback URL <span class="optional">(Optional)</span><br /><font color="grey">(For test Callback you can use this URL: http://groupdocs-dotnet-samples.apphb.com/samples/convert_callback )</font></label><br />
+        if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"]))){
             <input type='text', name='callback'  value="@Model["callback"]" size="70" />
-       }
-       else
-       {
+        }else{
             <input type='text', name='callback'  value="" size="70" />
-       }
-        <br />
+        }<br />
         <input type='submit' value='Make Request' id="btn"/>
         <span id="results_status" style="color:red;display:none;"> (Please wait for ajax response) </span>
-       <div id="link"></div>
-   }
-        <br />
-        <a href="http://groupdocs-php-samples.herokuapp.com/templates/testdocument.html">Download sample HTML file 1</a> 
-        <br />
-        <a href="http://groupdocs-php-samples.herokuapp.com/templates/base-simple_source.html">Download sample HTML file 2</a>
-        <br />
-        <a href="http://groupdocs-php-samples.herokuapp.com/templates/sampledoc3.html">Download sample HTML file 3</a>
-        <br />
-        <iframe id="downloadframe" style="display:none"></iframe>
-    
-        @if (Model != null)
-        {
-            if (Model["error"] != null)
-            {
-                @Model["error"]
-            }
-            else
-            {
-                    <div  id="result" style="padding:20px; border:1px solid black;">
-                        <p> Results: </p>
-                        <iframe src="https://apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="100%" height="600"></iframe>
-                        
-                   </div>
-            }
+        <div id="link"></div>
+   }<br />
+    <a href="http://groupdocs-php-samples.herokuapp.com/templates/testdocument.html">Download sample HTML file 1</a> <br />
+    <a href="http://groupdocs-php-samples.herokuapp.com/templates/base-simple_source.html">Download sample HTML file 2</a><br />
+    <a href="http://groupdocs-php-samples.herokuapp.com/templates/sampledoc3.html">Download sample HTML file 3</a><br />
+    <iframe id="downloadframe" style="display:none"></iframe>
+    @if (Model != null){
+        if (Model["error"] != null){
+            @Model["error"]
+        }else{
+            <div  id="result" style="padding:20px; border:1px solid black;">
+                <p> Results: </p>
+                <iframe src="https://apps.groupdocs.com/document-viewer/embed/@Model["guid"]" frameborder="0" width="100%" height="600"></iframe>  
+            </div>
         }
+    }
   </div>
 </div>
 
     @Html.Partial("links")
 
      <script type="text/javascript">
-                  
         $(document).ready(setTimeout(check, 5000));
-            
          function check() {
-             
              if (($("input[name=callback]").val() != "") && (document.getElementById("result") != null)) {
                  $('#results_status').fadeIn("slow");
                  form = document.forms.form;

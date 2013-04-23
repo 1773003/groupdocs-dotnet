@@ -1301,25 +1301,9 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
-                    //path to settings file - temporary save userId and apiKey like to property file
-                    String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
                     
-                    //open file in rewrite mode
-                    FileStream fcreate = System.IO.File.Open(infoFile, FileMode.Create); // will create the file or overwrite it if it already exists
-                    //String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-                    System.IO.StreamWriter infoFileStreamWriter = new StreamWriter(fcreate);
-                    //w = System.IO.File.CreateText(filePath);
-                    infoFileStreamWriter.WriteLine(userId); //save userId
-                    infoFileStreamWriter.WriteLine(privateKey); //save privateKey
-                    infoFileStreamWriter.Flush();
-                    infoFileStreamWriter.Close();
-
-                    String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
-                    //check if Downloads folder exists and remove it to clean all old files
-                    if (Directory.Exists(downloadFolder))
-                    {
-                        Directory.Delete(downloadFolder, true);
-                    }
+                    //path to settings file - temporary save userId and apiKey like to property file
+                    create_info_file(userId, privateKey);
 
                     //Create service (API Client object) linked to provided Groupdocs account
                     GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
@@ -1430,11 +1414,17 @@ namespace SamplesApp.Controllers
                 result.Add("private_key", private_key);
                 result.Add("sourceFileId", sourceFileId);
                 result.Add("targetFileId", targetFileId);
-                result.Add("callback", callback);
                 result.Add("basePath", basePath);
+
+                // Check if callback is not empty
+                if (!String.IsNullOrEmpty(callback))
+                {
+                    result.Add("callback", callback);
+                }
+
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || sourceFileId == null || targetFileId == null)
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key) || String.IsNullOrEmpty(sourceFileId) || String.IsNullOrEmpty(targetFileId))
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -1443,6 +1433,9 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
+                    
+                    //path to settings file - temporary save userId and apiKey like to property file
+                    create_info_file(userId, private_key);
 
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
@@ -1609,7 +1602,7 @@ namespace SamplesApp.Controllers
                 String email = Request.Form["email"];
                 String name = Request.Form["name"];
                 String lastName = Request.Form["lastName"];
-                String callback = Request.Form["callbackUrl"];
+                String callback = Request.Form["callback"];
                 var documet = Request.Files["file"];
                 String basePath = Request.Form["server_type"];
                 // Set entered data to the results list
@@ -1618,11 +1611,18 @@ namespace SamplesApp.Controllers
                 result.Add("email", email);
                 result.Add("firstName", name);
                 result.Add("lastName", lastName);
-                result.Add("callback", callback);
                 result.Add("basePath", basePath);
+
+                // Check if callback is not empty
+                if (!String.IsNullOrEmpty(callback))
+                {
+                    result.Add("callback", callback);
+                }
+
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || email == null || lastName == null || name == null || documet == null)
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key) || String.IsNullOrEmpty(email)
+                    || String.IsNullOrEmpty(lastName) || String.IsNullOrEmpty(name) || documet == null)
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -1631,6 +1631,9 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
+                    
+                    //path to settings file - temporary save userId and apiKey like to property file
+                    create_info_file(userId, private_key);
 
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
@@ -1714,7 +1717,7 @@ namespace SamplesApp.Controllers
                 String firstName = Request.Form["first_name"];
                 String lastName = Request.Form["last_name"];
                 String fileId = Request.Form["fileId"];
-                String callback = Request.Form["callbackUrl"];
+                String callback = Request.Form["callback"];
                 String basePath = Request.Form["server_type"];
                 // Set entered data to the results list
                 result.Add("client_id", userId);
@@ -1723,11 +1726,18 @@ namespace SamplesApp.Controllers
                 result.Add("firstName", firstName);
                 result.Add("lastName", lastName);
                 result.Add("fileId", fileId);
-                result.Add("callback", callback);
                 result.Add("basePath", basePath);
+
+                // Check if callback is not empty
+                if (!String.IsNullOrEmpty(callback))
+                {
+                    result.Add("callback", callback);
+                }
+
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || email == null || lastName == null || firstName == null || fileId == null)
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key) || String.IsNullOrEmpty(email)
+                    || String.IsNullOrEmpty(lastName) || String.IsNullOrEmpty(firstName) || String.IsNullOrEmpty(fileId))
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -1736,6 +1746,9 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
+                    
+                    //path to settings file - temporary save userId and apiKey like to property file
+                    create_info_file(userId, private_key);
 
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
@@ -2106,5 +2119,25 @@ namespace SamplesApp.Controllers
             Response.End();
         }
 
+        public void create_info_file(String userId, String private_key) {
+            //path to settings file - temporary save userId and apiKey like to property file
+            String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+
+            //open file in rewrite mode
+            FileStream fcreate = System.IO.File.Open(infoFile, FileMode.Create); // will create the file or overwrite it if it already exists
+            //String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+            System.IO.StreamWriter infoFileStreamWriter = new StreamWriter(fcreate);
+            //w = System.IO.File.CreateText(filePath);
+            infoFileStreamWriter.WriteLine(userId); //save userId
+            infoFileStreamWriter.WriteLine(private_key); //save privateKey
+            infoFileStreamWriter.Flush();
+            infoFileStreamWriter.Close();
+
+            String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+            //check if Downloads folder exists and remove it to clean all old files
+            if (Directory.Exists(downloadFolder)){
+                Directory.Delete(downloadFolder, true);
+            }
+        }
     }
 }

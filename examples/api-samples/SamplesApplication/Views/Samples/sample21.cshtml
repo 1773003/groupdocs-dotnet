@@ -9,90 +9,93 @@
 </head>
 <body>
 <h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample21</h3>
-
 <div class='samplecontent' style="padding:10px;">
-   <span class="description"><i>This sample will show how to use StorageApi to Create and Upload Envelop to GroupDocs account using .NET SDK</i></span> <br/>
-   <br />
-   <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_329">Docs for this sample</a></span>
-   <br />
-   <br/><p>You entered:
-@if (Model != null) {
- 
-           <p>ClientID = @Model["client_id"]</p>
-           <p>PrivateKey = @Model["private_key"]</p>
-           <p>Email = @Model["email"]</p>
-           <p>Name = @Model["name"]</p>
-           <p>Last Name = @Model["lastName"]</p>
-           <p>Callback = @Model["callback"]</p>
-           <p><font color="red">@Model["error"]</font></p>
-      
-}
+   <span class="description"><i>This sample will show how to use StorageApi to Create and Upload Envelop to GroupDocs account using .NET SDK</i></span> <br/><br />
+   <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_329">Docs for this sample</a></span><br />
+       <br/><p>You entered:
+    @if (Model != null) {
+        <p>ClientID = @Model["client_id"]</p>
+        <p>PrivateKey = @Model["private_key"]</p>
+        <p>Email = @Model["email"]</p>
+        <p>Name = @Model["name"]</p>
+        <p>Last Name = @Model["lastName"]</p>
+        <p>Callback = @Model["callback"]</p>
+        <p><font color="red">@Model["error"]</font></p>
+    }
    <br/>
    <div id="requestForm" style="padding:20px; border:1px solid black;">
    <p> Enter data for request and press "Make request" button </p>
-   @using (Html.BeginForm("sample21", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
-   {
-        <label for='client_id'>GroupDocs Client ID</label>
-        <br />
-        <input type='text', name='client_id' value="" />
-        <br />
-        <label for='private_key'>GroupDocs Private Key</label>
-        <br />
-        <input type='text', name='private_key'  value="" />
-        <br /> 
-        <label for='email'>Email</label>
-        <br />
-        <input type='text', name='email' />
-        <br />
-        <label for='name'>Name</label>
-        <br />
-        <input type='text', name='name' />
-        <br />
-        <label for='lastName'>Last Name</label>
-        <br />
-        <input type='text', name='lastName' />
-        <br />
-        <label for='file'>File</label>
-        <br />
-        <input type='file' name='file'  />
-        <br />
-        <label for='callbackUrl'>callbackUrl</label>
-        <br />
-        <input type='text', name='callbackUrl'  value="" />
-        <br />
-        <label for='server_type'>Choose Server</label>
-        <br />
+   @using (Html.BeginForm("sample21", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" })){
+        <label for='client_id'>GroupDocs Client ID</label><br />
+        <input type='text', name='client_id' value="" /><br />
+        <label for='private_key'>GroupDocs Private Key</label><br />
+        <input type='text', name='private_key'  value="" /><br /> 
+        <label for='email'>Email</label><br />
+        <input type='text', name='email' /><br />
+        <label for='name'>Name</label><br />
+        <input type='text', name='name' /><br />
+        <label for='lastName'>Last Name</label><br />
+        <input type='text', name='lastName' /><br />
+        <label for='file'>File</label><br />
+        <input type='file' name='file'  /><br />
+        <label for='callbackUrl'>callbackUrl</label><br />
+        if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"]))){
+            <input type='text', name='callback'  value="@Model["callback"]" size="70" />
+        }else{
+            <input type='text', name='callback'  value="" size="70" />
+        }<br />
+        <label for='server_type'>Choose Server</label><br />
         <select name="server_type" id="server_type">
                 <option selected value="https://api.groupdocs.com/v2.0">Prod</option>
                 <option value="https://dev-api.groupdocs.com/v2.0">Dev</option>
                 <option value="https://stage-api.groupdocs.com/v2.0">Stage</option>
-        </select>
-        <br />
+        </select><br />
         <input type='submit' value='Upload'/>
    }
-       
-        @if (Model != null) {
-            if (Model["error"] != null)
-            {
-                @Model["error"]
-            } else {
-                    <div  style="padding:20px; border:1px solid black;">
-                        <p> Results: </p>
-                        @{
-                            if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
-                                <iframe src = "https://apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
-                            } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
-                                <iframe src = "https://dev-apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
-                            } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
-                                <iframe src = "https://stage-apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
-                            }
-                         }
-                   </div>
-            }
+    @if (Model != null) {
+        if (Model["error"] != null){
+            @Model["error"]
+        } else {
+            <div id="result" style="padding:20px; border:1px solid black;">
+                <p> Results: </p>
+                @{
+                    if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
+                        <iframe src = "https://apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
+                    } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
+                        <iframe src = "https://dev-apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
+                    } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
+                        <iframe src = "https://stage-apps.groupdocs.com/signature/signembed/@Model["envelop"]/@Model["recipient"]" frameborder="0" width="700" height="700"></iframe>
+                    }
+                    }
+            </div>
         }
+    }
   </div>
 </div>
 
     @Html.Partial("links")
+
+    <script type="text/javascript">
+        $(document).ready(setTimeout(check, 5000));
+        function check() {
+            if (($("input[name=callback]").val() != "") && (document.getElementById("result") != null)) {
+                $('#results_status').fadeIn("slow");
+                form = document.forms.form;
+                $.ajax({
+                    type: 'POST',
+                    url: '/samples/check_file',
+                    success: function (data) {
+                        $('#results_status').fadeOut("slow");
+                        div = document.getElementById("link");
+                        p = document.createElement("p");
+                        p.innerHTML = "<br /> File " + data + " was downloaded.";
+                        div.appendChild(p);
+                        $("#downloadframe").attr("src", "/Samples/download_file?FileName=" + data);
+                    },
+                    dataType: "text"
+                });
+            }
+        }
+    </script>
 </body>
 </html>

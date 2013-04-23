@@ -2031,79 +2031,132 @@ namespace SamplesApp.Controllers
             }
 
         //### Callback check for Sample19
-        public ActionResult compare_callback()
-        {
+        public ActionResult compare_callback(){
+            // Get user info
+            String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+            System.IO.StreamReader userInfoFile = new System.IO.StreamReader(infoFile);
+            String userId = userInfoFile.ReadLine();
+            String privateKey = userInfoFile.ReadLine();
+            userInfoFile.Close();
+
             // Check is data posted 
-            if (Request.HttpMethod == "POST")
-            {
-                //Create txt file and write all resived from server data to this file
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/compare_callback.txt";
-                System.IO.StreamWriter w;
-                w = System.IO.File.CreateText(filePath);
-                w.WriteLine(Request.Params);
-                w.Flush();
-                w.Close();
-                //Read all strings from file for template
-                String r = System.IO.File.ReadAllText(filePath);
-                return View("compare_callback", null, r);
+            if (Request.HttpMethod == "POST"){
+                System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream);
+                String jsonString = reader.ReadToEnd();
+                var data = System.Web.Helpers.Json.Decode(jsonString);
+                String jobId = data.SourceId;
+                jobId = jobId.Replace(" ", "");
+                String fileId = "";
+                // Create service for Groupdocs account
+                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
+                //Make request to api for get document info by job id
+                Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
+                String name = "";
+                if (job.Inputs[0].Outputs[0].Guid != ""){
+                    //Return file guid to the template
+                    fileId = job.Inputs[0].Outputs[0].Guid;
+                    name = job.Inputs[0].Outputs[0].Name;
+                }
+                // Definition of folder where to download file
+                String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                if (!Directory.Exists(downloadFolder)){
+                    DirectoryInfo di = Directory.CreateDirectory(downloadFolder);
+                }
+                //### Make a request to Storage Api for dowloading file
+                // Download file
+                bool file = service.DownloadFile(fileId, downloadFolder + name);
+                return View("compare_callback");
             }
             // If data not posted return to template for filling of necessary fields
-            else
-            {
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/compare_callback.txt";
-                String r = System.IO.File.ReadAllText(filePath);
-                return View("compare_callback", null, r);
-                
+            else{
+                String jobId = userId + ":" + privateKey;
+                return View("compare_callback", null, jobId);
             }
         }
         //### Callback check for Sample21
-        public ActionResult signature_callback()
-        {
+        public ActionResult signature_callback(){
+            // Get user info
+            String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+            System.IO.StreamReader userInfoFile = new System.IO.StreamReader(infoFile);
+            String userId = userInfoFile.ReadLine();
+            String privateKey = userInfoFile.ReadLine();
+            userInfoFile.Close();
+
             // Check is data posted 
-            if (Request.HttpMethod == "POST")
-            {
-                //Create txt file and write all resived from server data to this file
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/signature_callback.txt";
-                System.IO.StreamWriter w;
-                w = System.IO.File.CreateText(filePath);
-                w.WriteLine(Request.Params);
-                w.Flush();
-                w.Close();
-                //Read all strings from file for template
-                String r = System.IO.File.ReadAllText(filePath);
-                return View("signature_callback", null, r);
+            if (Request.HttpMethod == "POST"){
+                System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream);
+                String jsonString = reader.ReadToEnd();
+                var data = System.Web.Helpers.Json.Decode(jsonString);
+                String jobId = data.SourceId;
+                jobId = jobId.Replace(" ", "");
+                String fileId = "";
+                // Create service for Groupdocs account
+                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
+                //Make request to api for get document info by job id
+                Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
+                String name = "";
+                if (job.Inputs[0].Outputs[0].Guid != ""){
+                    //Return file guid to the template
+                    fileId = job.Inputs[0].Outputs[0].Guid;
+                    name = job.Inputs[0].Outputs[0].Name;
+                }
+                // Definition of folder where to download file
+                String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                if (!Directory.Exists(downloadFolder)){
+                    DirectoryInfo di = Directory.CreateDirectory(downloadFolder);
+                }
+                //### Make a request to Storage Api for dowloading file
+                // Download file
+                bool file = service.DownloadFile(fileId, downloadFolder + name);
+                return View("signature_callback");
             }
             // If data not posted return to template for filling of necessary fields
-            else
-            {
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/signature_callback.txt";
-                String r = System.IO.File.ReadAllText(filePath);
-                return View("signature_callback");
+            else{
+                String jobId = userId + ":" + privateKey;
+                return View("signature_callback", null, jobId);
             }
         }
         //### Callback check for Sample22
-        public ActionResult annotation_callback()
-        {
+        public ActionResult annotation_callback(){
+            // Get user info
+            String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
+            System.IO.StreamReader userInfoFile = new System.IO.StreamReader(infoFile);
+            String userId = userInfoFile.ReadLine();
+            String privateKey = userInfoFile.ReadLine();
+            userInfoFile.Close();
+
             // Check is data posted 
-            if (Request.HttpMethod == "POST")
-            {
-                //Create txt file and write all resived from server data to this file
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/annotation_callback.txt";
-                System.IO.StreamWriter w;
-                w = System.IO.File.CreateText(filePath);
-                w.WriteLine(Request.Params);
-                w.Flush();
-                w.Close();
-                //Read all strings from file for template
-                String r = System.IO.File.ReadAllText(filePath);
-                return View("annotation_callback", null, r);
+            if (Request.HttpMethod == "POST"){
+                System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream);
+                String jsonString = reader.ReadToEnd();
+                var data = System.Web.Helpers.Json.Decode(jsonString);
+                String jobId = data.SourceId;
+                jobId = jobId.Replace(" ", "");
+                String fileId = "";
+                // Create service for Groupdocs account
+                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
+                //Make request to api for get document info by job id
+                Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
+                String name = "";
+                if (job.Inputs[0].Outputs[0].Guid != ""){
+                    //Return file guid to the template
+                    fileId = job.Inputs[0].Outputs[0].Guid;
+                    name = job.Inputs[0].Outputs[0].Name;
+                }
+                // Definition of folder where to download file
+                String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                if (!Directory.Exists(downloadFolder)){
+                    DirectoryInfo di = Directory.CreateDirectory(downloadFolder);
+                }
+                //### Make a request to Storage Api for dowloading file
+                // Download file
+                bool file = service.DownloadFile(fileId, downloadFolder + name);
+                return View("annotation_callback");
             }
             // If data not posted return to template for filling of necessary fields
-            else
-            {
-                String filePath = AppDomain.CurrentDomain.BaseDirectory + "downloads/annotation_callback.txt";
-                String r = System.IO.File.ReadAllText(filePath);
-                return View("annotation_callback");
+            else{
+                String jobId = userId + ":" + privateKey;
+                return View("annotation_callback", null, jobId);
             }
         }
 

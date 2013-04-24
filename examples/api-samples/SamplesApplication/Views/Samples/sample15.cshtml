@@ -38,6 +38,7 @@
         <br />
         <input type='submit' value='Make Request'/>
    }
+       </div>
        @if (Model != null) {
             if (Model["error"] != null)
             {
@@ -49,7 +50,7 @@
                    </div>
             }
         }
-    </div>
+    
 </div>
 
     @Html.Partial("links")

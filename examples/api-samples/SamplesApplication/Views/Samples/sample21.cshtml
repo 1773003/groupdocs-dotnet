@@ -52,7 +52,10 @@
                 <option value="https://stage-api.groupdocs.com/v2.0">Stage</option>
         </select><br />
         <input type='submit' value='Upload'/>
+        <span id="results_status" style="color:red;display:none;"> (Please wait for ajax response) </span>
+        <div id="link"></div>
    }
+     <iframe id="downloadframe" style="display:none"></iframe>
     @if (Model != null) {
         if (Model["error"] != null){
             @Model["error"]

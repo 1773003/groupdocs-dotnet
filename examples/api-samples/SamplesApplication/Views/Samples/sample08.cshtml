@@ -31,23 +31,23 @@
    {
         <label for='client_id'>GroupDocs Client ID</label>
         <br />
-        <input type='text', name='client_id' value="" />
+        <input type='text' name='client_id' value="" />
         <br />
         <label for='private_key'>GroupDocs Private Key</label>
         <br />
-        <input type='text', name='private_key'  value="" />
+        <input type='text' name='private_key'  value="" />
         <br /> 
         <label for='private_key'>FileID</label>
         <br />
-        <input type='text', name='fileId'  value="" />
+        <input type='text' name='fileId'  value="" />
         <br />
         <label for='private_key'>GroupDocs page number</label>
         <br />
-        <input type='text', name='pageNumber'  value="" />
+        <input type='text' name='pageNumber'  value="" />
         <br />
         <input type='submit' value='Make Request'/>
    }
-    
+    </div>
         @if (Model != null) {
             if (Model["error"] != null)
             {
@@ -68,7 +68,7 @@
                 </div>
             }
         }
-  </div>
+  
 </div>
 
     @Html.Partial("links")

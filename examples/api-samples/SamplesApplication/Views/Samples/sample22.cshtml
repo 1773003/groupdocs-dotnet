@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+   
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<title>GroupDocs Sample22</title>
     <link rel="stylesheet" type="text/css" href="/style.css" />
@@ -22,7 +22,6 @@
         <p>First Name = @Model["firstName"]</p>
         <p>Last Name = @Model["lastName"]</p>
         <p>File Id = @Model["fileId"]</p>
-        <p>Callback = @Model["callback"]</p>
         <p><font color="red">@Model["error"]</font></p>
     }
    <br/>
@@ -41,12 +40,6 @@
         <input type='text', name='last_name'  value="" /><br />
         <label for='fileId'>FileID</label><br />
         <input type='text', name='fileId'  value="" /><br />
-        <label for='callbackUrl'>callbackUrl</label><br />
-        if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"]))){
-            <input type='text', name='callback'  value="@Model["callback"]" size="70" />
-        }else{
-            <input type='text', name='callback'  value="" size="70" />
-        }<br />
         <label for='server_type'>Choose Server</label><br />
         <select name="server_type" id="server_type">
                 <option selected value="https://api.groupdocs.com/v2.0">Prod</option>
@@ -78,27 +71,5 @@
 
     @Html.Partial("links")
 
-    <script type="text/javascript">
-        $(document).ready(setTimeout(check, 5000));
-        function check() {
-            if (($("input[name=callback]").val() != "") && (document.getElementById("result") != null)) {
-                $('#results_status').fadeIn("slow");
-                form = document.forms.form;
-                $.ajax({
-                    type: 'POST',
-                    url: '/samples/check_file',
-                    success: function (data) {
-                        $('#results_status').fadeOut("slow");
-                        div = document.getElementById("link");
-                        p = document.createElement("p");
-                        p.innerHTML = "<br /> File " + data + " was downloaded.";
-                        div.appendChild(p);
-                        $("#downloadframe").attr("src", "/Samples/download_file?FileName=" + data);
-                    },
-                    dataType: "text"
-                });
-            }
-        }
-    </script>
 </body>
 </html>

@@ -29,6 +29,14 @@
    <p> Enter data for request and press "Make request" button </p>
    @using (Html.BeginForm("sample09", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
    {
+        <label for='client_id'>GroupDocs Client ID</label>
+        <br />
+        <input type='text' id='client_id' name='client_id' value="" />
+        <br />
+        <label for='private_key'>GroupDocs Private Key</label>
+        <br />
+        <input type='text' id='private_key' name='private_key'  value="" />
+        <br /> 
         <label for='private_key'>FileID</label>
         <br />
         <input type='text', name='fileId'  value="" />

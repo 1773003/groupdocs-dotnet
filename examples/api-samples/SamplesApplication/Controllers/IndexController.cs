@@ -596,7 +596,7 @@ namespace SamplesApp.Controllers
                 String pageNumber = Request.Form["pageNumber"];
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
-                result.Add("fileId", fileId);
+                result.Add("pageNumber", pageNumber);
                 String message = null;
                 // Check is all needed fields are entered
                 if (userId == null || private_key == null || fileId == null)
@@ -722,7 +722,7 @@ namespace SamplesApp.Controllers
                         
                     }
                     // If file wasn't found return error
-                    if (id == null)
+                    if (id.Equals(""))
                     {
                         
                         message = "File GuId you are entered is wrong";
@@ -1638,7 +1638,7 @@ namespace SamplesApp.Controllers
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
                     //Upload file for envelop
-                    Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(documet.FileName, String.Empty, documet.InputStream);
+                    Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(documet.FileName, String.Empty, documet.InputStream, false, "");
                     //Check is file uploaded
                     if (upload.Guid != null)
                     {
@@ -1648,7 +1648,7 @@ namespace SamplesApp.Controllers
                         {
                             decimal dec = new decimal();
                             //Get role list for curent user
-                            Groupdocs.Api.Contract.SignatureRolesResponse roles = service.GetSignatureRoles();
+                            Groupdocs.Api.Contract.SignatureRolesResponse roles = service.GetSignatureRoles("");
                             String roleId = "";
                             //Get id of role which can sign
                             for (int i = 0; i < roles.Result.Roles.Length; i++)
@@ -1717,7 +1717,6 @@ namespace SamplesApp.Controllers
                 String firstName = Request.Form["first_name"];
                 String lastName = Request.Form["last_name"];
                 String fileId = Request.Form["fileId"];
-                String callback = Request.Form["callback"];
                 String basePath = Request.Form["server_type"];
                 // Set entered data to the results list
                 result.Add("client_id", userId);
@@ -1727,13 +1726,6 @@ namespace SamplesApp.Controllers
                 result.Add("lastName", lastName);
                 result.Add("fileId", fileId);
                 result.Add("basePath", basePath);
-
-                // Check if callback is not empty
-                if (!String.IsNullOrEmpty(callback))
-                {
-                    result.Add("callback", callback);
-                }
-
                 String message = null;
                 // Check is all needed fields are entered
                 if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key) || String.IsNullOrEmpty(email)
@@ -1786,8 +1778,6 @@ namespace SamplesApp.Controllers
                         {
                             //Set reviewers rights for new user.
                             Groupdocs.Api.Contract.Annotation.SetReviewerRightsResult setReviewer = service.SetReviewerRights(fileId, addCollaborator.Collaborators);
-                            //Make request to Annotation api to set CallBack session
-                            Groupdocs.Api.Contract.Annotation.SetSessionCallbackUrlResult setCallback = service.SetSessionCallbackUrl(fileId, callback);
                             //Return GuId of new User to the template
                             result.Add("userId", newUser.Guid);
                             return View("Sample22", null, result);
@@ -2116,51 +2106,7 @@ namespace SamplesApp.Controllers
                 return View("signature_callback", null, jobId);
             }
         }
-        //### Callback check for Sample22
-        public ActionResult annotation_callback(){
-            // Get user info
-            String infoFile = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";
-            System.IO.StreamReader userInfoFile = new System.IO.StreamReader(infoFile);
-            String userId = userInfoFile.ReadLine();
-            String privateKey = userInfoFile.ReadLine();
-            userInfoFile.Close();
-
-            // Check is data posted 
-            if (Request.HttpMethod == "POST"){
-                System.IO.StreamReader reader = new System.IO.StreamReader(Request.InputStream);
-                String jsonString = reader.ReadToEnd();
-                var data = System.Web.Helpers.Json.Decode(jsonString);
-                String jobId = data.SourceId;
-                jobId = jobId.Replace(" ", "");
-                String fileId = "";
-                // Create service for Groupdocs account
-                GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, privateKey);
-                //Make request to api for get document info by job id
-                Groupdocs.Api.Contract.GetJobDocumentsResult job = service.GetJobDocuments(jobId);
-                String name = "";
-                if (job.Inputs[0].Outputs[0].Guid != ""){
-                    //Return file guid to the template
-                    fileId = job.Inputs[0].Outputs[0].Guid;
-                    name = job.Inputs[0].Outputs[0].Name;
-                }
-                // Definition of folder where to download file
-                String downloadFolder = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
-                if (!Directory.Exists(downloadFolder)){
-                    DirectoryInfo di = Directory.CreateDirectory(downloadFolder);
-                }
-                //### Make a request to Storage Api for dowloading file
-                // Download file
-                bool file = service.DownloadFile(fileId, downloadFolder + name);
-                return View("annotation_callback");
-            }
-            // If data not posted return to template for filling of necessary fields
-            else{
-                String jobId = userId + ":" + privateKey;
-                return View("annotation_callback", null, jobId);
-            }
-        }
-
-
+      
         // Method for file downloading from JS
         public void download_file() {
             string fileName = Request.QueryString["FileName"];

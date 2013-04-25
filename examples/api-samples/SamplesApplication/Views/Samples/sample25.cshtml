@@ -1,0 +1,144 @@
+﻿@model System.Collections.Hashtable
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>GroupDocs Sample25</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+
+</head>
+<body>
+<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample25</h3>
+
+<div class='samplecontent' style="padding:10px;">
+   <span class="description"><i>This sample will show how to convert DOCX with template fields file into PDF file using .NET SDK</i></span> <br/>
+   <br />
+   <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_412">Docs for this sample</a></span>
+   <br />
+   <br/><p>You entered:
+@if (Model != null) {
+ 
+           <p>ClientID = @Model["client_id"]</p>
+           <p>PrivateKey = @Model["private_key"]</p>
+           <p><font color="red">@Model["error"]</font></p>
+      
+}
+   <br/>
+   <div id="requestForm" style="padding:20px; border:1px solid black;">
+   <p> Enter data for request and press "Make request" button </p>
+   @using (Html.BeginForm("sample25", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
+        <br />
+            <label for='client_id'>GroupDocs Client ID</label>
+            <br />
+            <input type='text', name='client_id' value="" />
+            <br />
+            <label for='private_key'>GroupDocs PrivateKey</label>
+            <br />
+            <input type='text', name='private_key'  value="" />
+            <br />
+            <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
+            <br />
+            <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
+            <br />
+            <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
+            <br />
+            
+            <label for='private_key' id="guid">GroupDocs fileID</label>
+            <br />
+            <input type='text' name='fileId' id="guidfield" value="" />
+            
+            <label for='file' id="file" style="display:none;">Local file</label>
+            <br />
+            <input type='file' name='file' id="filefield" style="display:none;" />
+
+            <label for='private_key' style="display:none;" id="url">File URL</label>
+            <br />
+            <input type='text' name='url'  value="" id="urlfield" style="display:none;" />
+            <br />
+            <label for='server_type'>Base path<span class="optional">(Optional)</span></label>
+            <br />
+            <input type ="text" name="server_type" id="server_type" />
+            <br />
+            <input type='submit' value='Make Request'/>
+   }
+    
+        @if (Model != null) {
+            if (Model["error"] != null)
+            {
+                @Model["error"]
+            } else {
+                  <div  style="padding:20px; border:1px solid black;">
+                    <p> Results: </p>
+                        <font color="green">@Model["message"]</font>
+                        @{
+                            if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
+                                <iframe src = "https://apps.groupdocs.com/document-viewer/embed/@Model["fileId"]" frameborder="0" width="700" height="700"></iframe>
+                            } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
+                                <iframe src = "https://dev-apps.groupdocs.com/document-viewer/embed/@Model["fileId"]" frameborder="0" width="700" height="700"></iframe>
+                            } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
+                                <iframe src = "https://stage-apps.groupdocs.com/document-viewer/embed/@Model["fileId"]" frameborder="0" width="700" height="700"></iframe>
+                            }
+                         }
+                  </div>
+            }
+        }
+  </div>
+</div>
+
+    @Html.Partial("links")
+    <script type="text/javascript">
+
+        function display(_element_id) {
+
+            if (_element_id == "guid") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "inline";
+                element6.style.display = "inline";
+
+            }
+
+            if (_element_id == "local") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+
+            }
+
+            if (_element_id == "url") {
+                var element1 = document.getElementById("url");
+                var element2 = document.getElementById("urlfield");
+                var element3 = document.getElementById("file");
+                var element4 = document.getElementById("filefield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+            }
+
+        }
+</script>
+</body>
+</html>

@@ -248,6 +248,9 @@
   <ItemGroup>
     <Content Include="Views\Samples\convert_callback.cshtml" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\sample25.cshtml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

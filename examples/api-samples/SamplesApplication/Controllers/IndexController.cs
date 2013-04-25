@@ -1914,6 +1914,194 @@ namespace SamplesApp.Controllers
                 return View("Sample24");
             }
         }
+
+        //### <i>This sample will show how to convert DOCX with template fields file into PDF file</i>
+        public ActionResult Sample25()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                String fileGuId = "";
+                var file = Request.Files["file"];
+                String basePath = Request.Form["server_type"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                String message = null;
+                // Check is all needed fields are entered
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key))
+                {
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
+                    result.Add("error", message);
+                    return View("Sample25", null, result);
+                }
+                else
+                {
+                    //Check is base path entered
+                    if (basePath.Equals(""))
+                    {
+                        //If base path empty set base path to the dev server
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    result.Add("basePath", basePath);
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Make request to get document pages as images
+                    //if URL to web file was provided - upload the file from Web and get it's GUID
+                    if (url != "")
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //If file uploaded return his GuId
+                            fileGuId = guid;
+
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample25", null, result);
+                        }
+                    }
+
+                    //if file was uploaded locally - upload the file and get it's GUID
+                    if (file.FileName != "")
+                    {
+                        //Upload local file 
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        if (upload.Guid != null)
+                        {
+                            //If file uploaded return his guid
+                            fileGuId = upload.Guid;
+                        }
+                        else
+                        {
+                            //If file wasn't uploaded return error
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample25", null, result);
+                        }
+                    }
+                    //If user choose file guid
+                    if (!fileId.Equals(""))
+                    {
+                        //Set file guid as entered by user file guid
+                        fileGuId = fileId;
+                    }
+                    //Get all fields from template
+                    Groupdocs.Api.Contract.TemplateFieldsResult fields = service.GetTemplateFields(fileGuId);
+                    if (fields.Fields.Length > 0)
+                    {
+                        //Set fileds counter
+                        Int32 count = fields.Fields.Length;
+                        //Create Datasource object
+                        Groupdocs.Api.Contract.Datasource dataSource = new Groupdocs.Api.Contract.Datasource();
+                        //Create array of DatasourceField objects
+                        Groupdocs.Api.Contract.DatasourceField[] fieldArray = new Groupdocs.Api.Contract.DatasourceField[count];
+                        //Create array od objects with
+                        object[] values = new object[2];
+                        //Set object array content
+                        values.SetValue("value1", 0);
+                        values.SetValue("value2", 1);
+                        //Set DatasourceFiled data
+                        for (int i = 0; i < count; i++)
+                        {
+                            Groupdocs.Api.Contract.DatasourceField field = new Groupdocs.Api.Contract.DatasourceField();
+                            Groupdocs.Api.Contract.DatasourceFieldType type = new Groupdocs.Api.Contract.DatasourceFieldType();
+                            type = 0;
+                            field.Name = fields.Fields[i].Name;
+                            field.Type = type;
+                            field.Values = values;
+                            //Push DatasourceField to array of DatasourceField objects
+                            fieldArray.SetValue(field, i);
+                        }
+                        //Set feilds array to the Datasource
+                        dataSource.Fields = fieldArray;
+                        //Add new Datasource to GroupDocs
+                        decimal addDataSource = service.AddDataSource(dataSource);
+                        //Check is not empty addDataSource
+                        if (!addDataSource.Equals(""))
+                        {
+                            //If status ok merge Datasource to new pdf file
+                           decimal job = service.MergeTemplate(fileGuId, addDataSource, "pdf", false);
+                           if (!job.Equals(""))
+                           {
+                               Groupdocs.Api.Contract.GetJobDocumentsResult jobInfo = new Groupdocs.Api.Contract.GetJobDocumentsResult();
+                                //### Check job status
+                               for (int n = 0; n <= 5; n++)
+                               {
+                                   //Delay necessary that the inquiry would manage to be processed
+                                   System.Threading.Thread.Sleep(5000);
+                                   //Make request to api for get document info by job id
+                                   jobInfo = service.GetJobDocuments(job);
+                                   //Check job status, if status is Completed or Archived exit from cycle
+                                   if (jobInfo.JobStatus.Equals("Completed") || jobInfo.JobStatus.Equals("Archived"))
+                                   {
+                                       break;
+                                       //If job status Postponed throw exception with error
+                                   }
+                                   else if (jobInfo.JobStatus.Equals("Postponed"))
+                                   {
+                                       result.Add("error", "Job is fail");
+                                       return View("Sample25", null, result);
+
+                                   }
+                               }
+                               //Get guid
+                               String guid = jobInfo.Inputs[0].Outputs[0].Guid;
+                               //Get name
+                               String name = jobInfo.Inputs[0].Outputs[0].Name;
+                               // Definition of folder where to download file
+                               String LocalPath = AppDomain.CurrentDomain.BaseDirectory + "downloads/";
+                               if (!Directory.Exists(LocalPath))
+                               {
+                                   DirectoryInfo di = Directory.CreateDirectory(LocalPath);
+                               }
+                               //### Make a request to Storage Api for dowloading file
+                               // Download file
+                               bool download = service.DownloadFile(guid, LocalPath + name);
+                               // If file downloaded successful
+                               if (download != false)
+                               {
+                                   // Put file info to the result's list
+                                   result.Add("message", "File was converted and downloaded to the " + LocalPath + "/" + name);
+                                   result.Add("fileId", guid);
+                                   // Return to the template 
+                                   return View("Sample25", null, result);
+                               }
+
+                           }
+                           else
+                           {
+                               result.Add("error", "MargeTemplate is fail");
+                               return View("Sample25", null, result);
+                           }
+                        }
+                        else
+                        {
+                            result.Add("error", "AddDataSource returned empty job id");
+                            return View("Sample25", null, result);
+                        }
+                    }
+                    return View("Sample25", null, result);
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample25");
+            }
+        }
+
         //### Callback check for Sample18
         public ActionResult convert_callback()
         {

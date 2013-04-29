@@ -313,7 +313,10 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
                 String fileId = Request.Form["srcPath"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
                 String destPath = Request.Form["destPath"];
                 String action = Request.Form["copy"];
                 // Set entered data to the results list
@@ -323,7 +326,7 @@ namespace SamplesApp.Controllers
                 result.Add("destPath", destPath);
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == "" || private_key == "" || fileId == "" || destPath == "")
+                if (userId == "" || private_key == "" || destPath == "")
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -332,69 +335,141 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
                     // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                    //### Get all files and folders from account. 
-                    Groupdocs.Api.Contract.ListEntitiesResult files = service.GetFileSystemEntities("", 0, -1, null, true, null, null);
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
                     // Create empty variable for file name and id
                     String name = null;
                     decimal id = new decimal();
-                    // Check is files is not null
-                    if (files.Files != null)
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
                     {
-                        // Obtaining file name and id for entered file GuId
-                        for (int i = 0; i < files.Files.Length; i++)
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
                         {
-                            if (files.Files[i].Guid == fileId)
+                            // Put uploaded file GuId to the result's list
+                            id = upload.Id;
+                            name = upload.AdjustedName;
+
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample05", null, result);
+                        }
+                          
+                     }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
                             {
-                                name = files.Files[i].Name;
-                                id = files.Files[i].Id;
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        id = storageInfo.Files[i].Id;
+                                        name = storageInfo.Files[i].Name;
+                                    }
+
+                                }
                             }
-
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample05", null, result);
+                            }
                         }
-                        // Check is entered file GuId exists
-                        if (name == null || id == 0)
-                        {
-                           result.Add("error", "File was not found");
-                           return View("Sample05", null, result);
-                        }
-                        // Create path to where copy/move file
-                        String path = destPath + "/" + name;
-                        Groupdocs.Api.Contract.FileMoveResponse transfer = new Groupdocs.Api.Contract.FileMoveResponse();
-                        // Copy file if user choose copy
-                        if (action == "Copy")
-                        {
-                            // Create empty Overide mode
-                            Groupdocs.Common.OverrideMode overide = new Groupdocs.Common.OverrideMode();
-                            // Make request to the Api to copy file
-                            transfer = service.CopyFile(id, path, overide);
-                            // Put message to result's list
-                            result.Add("button", "Copied");
-
-                        }
-                        // If user choose Move file
+                        //If file wasn't uploaded return error
                         else
                         {
-                            Groupdocs.Common.OverrideMode overide = new Groupdocs.Common.OverrideMode();
-                            transfer = service.MoveFile(id, path, overide);
-                            result.Add("button", "Moved");
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample05", null, result);
                         }
-                        // Check is copy/move is successful
-                        if (transfer.Status.Equals("Ok"))
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        //Get all files from GroupDocs account
+                        Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("", 0, -1, null, false, null, null, true);
+                        if (storageInfo.Files.Length > 0)
                         {
-                            // If successful put path to the copy/moved file to the results list
-                            result.Add("path", path);
+                            // Get file id and name by entered file GuId
+                            for (int i = 0; i < storageInfo.Files.Length; i++)
+                            {
+                                if (storageInfo.Files[i].Guid == fileId)
+                                {
+                                    id = storageInfo.Files[i].Id;
+                                    name = storageInfo.Files[i].Name;
+                                }
+
+                            }
                         }
                         else
                         {
-                            // If failed put error message
-                            result.Add("error", transfer.ErrorMessage);
+                            message = "Get files list is failed";
+                            result.Add("error", message);
+                            return View("Sample05", null, result);
                         }
+                    }
+                    // Check is entered file GuId exists
+                    if (name == null || id == 0)
+                    {
+                        result.Add("error", "File was not found");
+                        return View("Sample05", null, result);
+                    }
+                    // Create path to where copy/move file
+                    String path = destPath + "/" + name;
+                    Groupdocs.Api.Contract.FileMoveResponse transfer = new Groupdocs.Api.Contract.FileMoveResponse();
+                    // Copy file if user choose copy
+                    if (action == "Copy")
+                    {
+                        // Create empty Overide mode
+                        Groupdocs.Common.OverrideMode overide = new Groupdocs.Common.OverrideMode();
+                        // Make request to the Api to copy file
+                        transfer = service.CopyFile(id, path, overide);
+                        // Put message to result's list
+                        result.Add("button", "Copied");
 
                     }
-                    // Return results to the template
-                   return View("Sample05", null, result);         
+                    // If user choose Move file
+                    else
+                    {
+                        Groupdocs.Common.OverrideMode overide = new Groupdocs.Common.OverrideMode();
+                        transfer = service.MoveFile(id, path, overide);
+                        result.Add("button", "Moved");
+                    }
+                    // Check is copy/move is successful
+                    if (transfer.Status.Equals("Ok"))
+                    {
+                        // If successful put path to the copy/moved file to the results list
+                        result.Add("path", path);
+                    }
+                    else
+                    {
+                        // If failed put error message
+                        result.Add("error", transfer.ErrorMessage);
+                    }
+
                 }
+                // Return results to the template
+                return View("Sample05", null, result);         
+            
 
             }
             // If data not posted return to template for filling of necessary fields
@@ -592,7 +667,11 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
                 String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
+                String fileGuId = "";
                 String pageNumber = Request.Form["pageNumber"];
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
@@ -608,15 +687,101 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
                     // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
+                    {
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
+                        {
+                            // Put uploaded file GuId to the result's list
+                            fileGuId = upload.Guid;
+
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample08", null, result);
+                        }
+
+                    }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
+                            {
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        fileGuId = storageInfo.Files[i].Guid;
+                                        
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample08", null, result);
+                            }
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample08", null, result);
+                        }
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        //Get all files from GroupDocs account
+                        Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("", 0, -1, null, false, null, null, true);
+                        if (storageInfo.Files.Length > 0)
+                        {
+                            // Get file id and name by entered file GuId
+                            for (int i = 0; i < storageInfo.Files.Length; i++)
+                            {
+                                if (storageInfo.Files[i].Guid == fileId)
+                                {
+                                    fileGuId = storageInfo.Files[i].Guid;
+                                    
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            message = "Get files list is failed";
+                            result.Add("error", message);
+                            return View("Sample08", null, result);
+                        }
+                    }
                     // Make request to get page image url
-                    String[] url = service.GetDocumentPagesImageUrls(fileId, "600x750", String.Empty, Int32.Parse(pageNumber), 1, 100, false);
+                    String[] pageUrl = service.GetDocumentPagesImageUrls(fileGuId, "600x750", String.Empty, Int32.Parse(pageNumber), 1, 100, false);
                     // Check if url is not null
-                    if (url != null)
+                    if (pageUrl != null)
                     {
                         // Redirect to template with receive URL
-                        result.Add("url", url[0]);
+                        result.Add("url", pageUrl[0]);
                         return View("Sample08", null, result);
                     }
                     // Else return error to the template
@@ -644,31 +809,141 @@ namespace SamplesApp.Controllers
             {
                 //### Set variables and get POST data
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
                 String width = Request.Form["width"];
                 String height = Request.Form["height"];
+                String basePath = Request.Form["server_type"];
                 String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
+                String fileGuId = "";
                 result.Add("width", width);
                 result.Add("height", height);
                 result.Add("fileId", fileId);
                 String message = null;
-                // If entered file id is null
-                if (fileId == null)
+                if (userId == null || private_key == null || fileId == null)
                 {
-                    // Return error message
-                    message = "Please enter file id";
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
                     result.Add("error", message);
-
-                    return View("Sample09", null, result);
+                    return View("Sample08", null, result);
                 }
                 else
                 {
-                    // Generate Embed viewer url with entered file id
-                     String iframe = "https://apps.groupdocs.com/document-viewer/embed/" + fileId + " frameborder=0 width=" + width + " height=" + height;
-                     result.Add("iframe", iframe);
-                     return View("Sample09", null, result);
-                    
-                }
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    // If entered file id is null
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
+                    {
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
+                        {
+                            // Put uploaded file GuId to the result's list
+                            fileGuId = upload.Guid;
 
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample09", null, result);
+                        }
+
+                    }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
+                            {
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        fileGuId = storageInfo.Files[i].Guid;
+
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample09", null, result);
+                            }
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample09", null, result);
+                        }
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        //Get all files from GroupDocs account
+                        Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("", 0, -1, null, false, null, null, true);
+                        if (storageInfo.Files.Length > 0)
+                        {
+                            // Get file id and name by entered file GuId
+                            for (int i = 0; i < storageInfo.Files.Length; i++)
+                            {
+                                if (storageInfo.Files[i].Guid == fileId)
+                                {
+                                    fileGuId = storageInfo.Files[i].Guid;
+
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            message = "Get files list is failed";
+                            result.Add("error", message);
+                            return View("Sample09", null, result);
+                        }
+                    }
+                    String iframe = "";
+                    // Generate Embed viewer url with entered file id
+                    if (basePath.Equals("https://api.groupdocs.com/v2.0"))
+                    {
+                        iframe = "https://apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                    }
+                    if (basePath.Equals("https://dev-api.groupdocs.com/v2.0"))
+                    {
+                        iframe = "https://dev-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                    }
+                    if (basePath.Equals("https://stage-api.groupdocs.com/v2.0"))
+                    {
+                        iframe = "https://stage-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                    }
+                    if (basePath.Equals("https://realtime-api.groupdocs.com/v2.0"))
+                    {
+                        iframe = "https://realtime-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                    }
+                    result.Add("iframe", iframe);
+                    return View("Sample09", null, result);
+
+
+
+                }
             }
             // If data not posted return to template for filling of necessary fields
             else
@@ -686,7 +961,10 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
                 String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
                 String email = Request.Form["email"];
                 // Set entered data to the results list
                 result.Add("client_id", userId);
@@ -695,7 +973,7 @@ namespace SamplesApp.Controllers
                 result.Add("email", email);
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || fileId == null || email == null)
+                if (userId == null || private_key == null || email == null)
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -707,28 +985,95 @@ namespace SamplesApp.Controllers
                     // Create string array with emails
                     String[] sharers = new String[1];
                     sharers[0] = email;
-                    // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                    // Get all files from storage
-                    Groupdocs.Api.Contract.ListEntitiesResult files = service.GetFileSystemEntities("", 0, -1, null, true, null, null);
-                    decimal id = new decimal();
-                    // Get file id by entered file GuId
-                    for (int i = 0; i < files.Files.Length; i++) 
+                    if (basePath == "")
                     {
-                        if (files.Files[i].Guid == fileId)
-                        {
-                            id = files.Files[i].Id;
-                        }
-                        
+                        basePath = "https://api.groupdocs.com/v2.0";
                     }
-                    // If file wasn't found return error
-                    if (id.Equals(""))
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    decimal id = new decimal();
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
                     {
-                        
-                        message = "File GuId you are entered is wrong";
-                        result.Add("error", message);
-                        return View("Sample10", null, result);
-                        
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
+                        {
+                            // Put uploaded file GuId to the result's list
+                            id = upload.Id;
+                           
+
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample10", null, result);
+                        }
+
+                    }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
+                            {
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        id = storageInfo.Files[i].Id;
+                                       
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample10", null, result);
+                            }
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample10", null, result);
+                        }
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        //Get all files from GroupDocs account
+                        Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("", 0, -1, null, false, null, null, true);
+                        if (storageInfo.Files.Length > 0)
+                        {
+                            // Get file id and name by entered file GuId
+                            for (int i = 0; i < storageInfo.Files.Length; i++)
+                            {
+                                if (storageInfo.Files[i].Guid == fileId)
+                                {
+                                    id = storageInfo.Files[i].Id;
+                                    
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            message = "Get files list is failed";
+                            result.Add("error", message);
+                            return View("Sample10", null, result);
+                        }
                     }
                     // Make request to share document
                     Groupdocs.Api.Contract.SharedUsersResult share = service.ShareDocument(id, sharers);
@@ -767,7 +1112,11 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
                 String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
+                String fileGuId = "";
                 String annotation_type = Request.Form["annotation_type"];
                 String box_x = Request.Form["box_x"];
                 String box_y = Request.Form["box_y"];
@@ -786,7 +1135,7 @@ namespace SamplesApp.Controllers
                 result.Add("type", annotation_type);
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || fileId == null || annotation_type == null)
+                if (userId == null || private_key == null || annotation_type == null)
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -796,9 +1145,95 @@ namespace SamplesApp.Controllers
                 else
                 {
 
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    result.Add("basePath", basePath);
                     // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                    //Make request to api for convert file
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
+                    {
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
+                        {
+                            // Put uploaded file GuId to the result's list
+                            fileGuId = upload.Guid;
+
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample11", null, result);
+                        }
+
+                    }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
+                            {
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        fileGuId = storageInfo.Files[i].Guid;
+
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample11", null, result);
+                            }
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample11", null, result);
+                        }
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        //Get all files from GroupDocs account
+                        Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("", 0, -1, null, false, null, null, true);
+                        if (storageInfo.Files.Length > 0)
+                        {
+                            // Get file id and name by entered file GuId
+                            for (int i = 0; i < storageInfo.Files.Length; i++)
+                            {
+                                if (storageInfo.Files[i].Guid == fileId)
+                                {
+                                    fileGuId = storageInfo.Files[i].Guid;
+
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            message = "Get files list is failed";
+                            result.Add("error", message);
+                            return View("Sample11", null, result);
+                        }
+                    }
                    //###Create AnnotationType
                    Groupdocs.Common.AnnotationType type = new Groupdocs.Common.AnnotationType();
                    //Create Rectangle object
@@ -840,7 +1275,7 @@ namespace SamplesApp.Controllers
                        rectangle.Height = float.Parse(box_height);
                    }
                    //### Make request to Api to create Annotation
-                   Groupdocs.Api.Contract.Annotation.CreateAnnotationResult annotation = service.CreateAnnotation(fileId, type, rectangle, point, range, null, null);
+                   Groupdocs.Api.Contract.Annotation.CreateAnnotationResult annotation = service.CreateAnnotation(fileGuId, type, rectangle, point, range, null, null);
                    //Check if GuId of document with added annotation is not empty
                     if (annotation.DocumentGuid != "")
                    {
@@ -876,7 +1311,7 @@ namespace SamplesApp.Controllers
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
                 String fileId = Request.Form["fileId"];
-               
+                String basePath = Request.Form["server_type"];
                 // Set entered data to the results list
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
@@ -892,8 +1327,13 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    result.Add("basePath", basePath);
                     // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
                     // Get all annotations from document
                     Groupdocs.Api.Contract.Annotation.ListAnnotationsResult annotations = service.ListAnnotations(fileId);
                     // If annotations wasn't found return error
@@ -958,16 +1398,20 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
-                String fileId = Request.Form["fileId"];
                 String email = Request.Form["email"];
+                String basePath = Request.Form["server_type"];
+                String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
+                String fileGuId = "";
                 // Set entered data to the results list
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
-                result.Add("fileId", fileId);
+                
                 result.Add("email", email);
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || fileId == null || email == null)
+                if (userId == null || private_key == null || email == null)
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -979,15 +1423,82 @@ namespace SamplesApp.Controllers
                     // Create string array with emails
                     String[] collaborators = new String[1];
                     collaborators[0] = email;
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
                     // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
+                    {
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
+                        {
+                            // Put uploaded file GuId to the result's list
+                            fileGuId = upload.Guid;
+
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample13", null, result);
+                        }
+
+                    }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
+                            {
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        fileGuId = storageInfo.Files[i].Guid;
+
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample13", null, result);
+                            }
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample13", null, result);
+                        }
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        fileGuId = fileId;
+                    }
                     // Make request to set annotation collaborators
-                    Groupdocs.Api.Contract.Annotation.SetCollaboratorsResult collaborate = service.SetAnnotationCollaborators(fileId, collaborators);
+                    Groupdocs.Api.Contract.Annotation.SetCollaboratorsResult collaborate = service.SetAnnotationCollaborators(fileGuId, collaborators);
                     // Check is request return data
                     if (collaborate != null)
                     {
                         // Return primary email to the template
                         result.Add("collaborator", collaborate.Collaborators[0].PrimaryEmail);
+                        result.Add("fileId", fileGuId);
                         return View("Sample13", null, result);
                     }
                     // If request return's null return error to the template
@@ -1148,24 +1659,98 @@ namespace SamplesApp.Controllers
             // Check is data posted    
             if (Request.HttpMethod == "POST")
             {
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
+                String fileId = Request.Form["fileId"];
+                String url = Request.Form["url"];
+                var file = Request.Files["file"];
+                String fileGuId = "";
+                String message = null;
                 //### Set variables and get POST data
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
-                String fileId = Request.Form["fileId"];
-                String message = "";
-                if (fileId == null)
+                if (userId == null || private_key == null)
                 {
-                    //If not all fields entered send error message
-                    message = "Please enter File Id";
+                    // If not all fields entered send error message
+                    message = "Please enter all parameters";
                     result.Add("error", message);
-                    // Transfer error message to template
                     return View("Sample16", null, result);
                 }
                 else
                 {
-                    result.Add("guid", fileId);
-                   
+
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    result.Add("basePath", basePath);
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    //Check is chosen local file
+                    if (!file.ContentLength.Equals(0))
+                    {
+                        // Upload file with empty description.
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        // Check is upload successful
+                        if (upload.Guid != null)
+                        {
+                            // Put uploaded file GuId to the result's list
+                            fileGuId = upload.Guid;
+
+                        }
+                        // If upload was failed return error
+                        else
+                        {
+                            message = "UploadFile returns error";
+                            result.Add("error", message);
+                            return View("Sample16", null, result);
+                        }
+
+                    }
+                    //Check is url entered
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+                            //Get all files from GroupDocs account
+                            Groupdocs.Api.Contract.ListEntitiesResult storageInfo = service.GetFileSystemEntities("My Web Documents", 0, -1, null, false, null, null, true);
+                            if (storageInfo.Files.Length > 0)
+                            {
+                                // Get file id by uploaded file GuId
+                                for (int i = 0; i < storageInfo.Files.Length; i++)
+                                {
+                                    if (storageInfo.Files[i].Guid == guid)
+                                    {
+                                        fileGuId = storageInfo.Files[i].Guid;
+
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                message = "Get files list is failed";
+                                result.Add("error", message);
+                                return View("Sample16", null, result);
+                            }
+                        }
+                        //If file wasn't uploaded return error
+                        else
+                        {
+                            result.Add("error", "Something wrong with entered data");
+                            return View("Sample16", null, result);
+                        }
+                    }
+                    //Check is file guid entered
+                    if (!fileId.Equals(""))
+                    {
+                        fileGuId = fileId;
+                    }
+                    //Set data for template
+                    result.Add("guid", fileGuId);
                 }
-                // Transfer error message to template
                 return View("Sample16", null, result);
             }
             // If data not posted return to template for filling of necessary fields

@@ -167,3 +167,19 @@ table {
 			text-shadow:0 2px 5px #000;
 			margin:0;
 		}
+    .optional {
+        color: grey;
+        font-style: italic;
+    }
+
+    .description {
+        font-style: italic;
+        background: url(/../images/info.png) no-repeat left;
+        padding-left: 25px;
+    }
+
+    .documentation {
+        float: right;
+        background: url(/../images/help.png) no-repeat left;
+        padding-left: 20px;
+    }

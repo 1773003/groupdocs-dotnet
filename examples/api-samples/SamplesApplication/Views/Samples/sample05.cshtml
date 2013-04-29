@@ -37,14 +37,34 @@
         <label for='private_key'>GroupDocs Private Key</label>
         <br />
         <input type='text' name='private_key'  value="" />
-        <br /> 
-        <label for='private_key'>FileID</label>
+        <br />
+       <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
        <br />
-       <input type='text' name='srcPath'  value="" />
+       <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
+       <br />
+       <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
+       <br />
+       <br /> 
+       <label for='private_key' id="guid">File ID (GUID)</label>
+       <br />
+       <input type='text' name='srcPath'  id="guidfield" value="" />
+       <br />
+       <label for='private_key' style="display:none;" id="url">Upload file from URL</label>
+        <br />
+        <input type='text' name='url'  value="" id="urlfield" style="display:none;" />
+        
+        <label for='file' id="file" style="display:none;">Upload local file</label>
+        <br />
+        <input type='file' name='file' id="filefield" style="display:none;" />
+        <br />
        <br />
        <label for='private_key'>Folder in which you want to copy file</label>
        <br />
        <input type='text' name='destPath'  value="" />
+       <br />
+       <label for='server_type'>Base Path <font color="grey">(Optional)</font></label>
+         <br />
+        <input name="server_type" id="server_type" />
        <br />
        <input name='copy' type='submit' value='Copy'/>
        <input name='move' type='submit' value='Move'/>
@@ -52,7 +72,8 @@
 
   </div>
 
-    @if (Model != null) {
+    @if (Model != null)
+    {
         
         <h4><font color="green">Your file was @Model["button"] to: @Model["path"]</font></h4>
     }
@@ -60,5 +81,57 @@
 </div>
 
     @Html.Partial("links")
+    <script type="text/javascript">
+        function display(_element_id) {
+
+            if (_element_id == "guid") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "inline";
+                element6.style.display = "inline";
+
+            }
+
+            if (_element_id == "local") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+
+            }
+
+            if (_element_id == "url") {
+                var element1 = document.getElementById("url");
+                var element2 = document.getElementById("urlfield");
+                var element3 = document.getElementById("file");
+                var element4 = document.getElementById("filefield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+            }
+
+        }
+</script>
 </body>
 </html>

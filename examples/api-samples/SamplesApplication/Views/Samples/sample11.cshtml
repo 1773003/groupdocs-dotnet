@@ -16,7 +16,8 @@
    <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_176">Docs for this sample</a></span>
    <br />
    <br/><p>You entered:
-@if (Model != null) {
+@if (Model != null)
+{
  
            <p>ClientID = @Model["client_id"]</p>
            <p>PrivateKey = @Model["private_key"]</p>
@@ -38,9 +39,27 @@
         <br />
         <input type='text', name='private_key'  value="" />
         <br /> 
-        <label for='private_key'>FileID</label>
+        <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
+       <br />
+       <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
+       <br />
+       <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
+       <br />
+       <br /> 
+       <label for='private_key' id="guid">File ID (GUID)</label>
+       <br />
+       <input type='text' name='fileId'  id="guidfield" value="" />
+       <br />
+       <label for='private_key' style="display:none;" id="url">Upload file from URL</label>
         <br />
-        <input type='text', name='fileId'  value="" />
+        <input type='text' name='url'  value="" id="urlfield" style="display:none;" />
+        <label for='file' id="file" style="display:none;">Upload local file</label>
+        <br />
+        <input type='file' name='file' id="filefield" style="display:none;" />
+       <br />
+       <label for='server_type'>Base Path <font color="grey">(Optional)</font></label>
+         <br />
+        <input name="server_type" id="server_type" />
         <br />
         <select name="annotation_type" id="annotation_type">
                 <option value="text" onclick="show_hide('text')";>Text</option>
@@ -104,14 +123,25 @@
              
    }
             
-        @if (Model != null) {
+        @if (Model != null)
+        {
             if (Model["error"] != null)
             {
                 @Model["error"]
-            } else {
+            }
+            else
+            {
                     <div  style="padding:20px; border:1px solid black;">
                         <p> Results: </p>
-                        <iframe src="https://apps.groupdocs.com/document-annotation2/embed/@Model["guid"]" frameborder="0" width="100%" height="600"></iframe>
+                         @{
+                            if(Model["basePath"].Equals("https://api.groupdocs.com/v2.0")) {
+                                <iframe src = "https://apps.groupdocs.com/document-annotation2/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+                            } else if(Model["basePath"].Equals("https://dev-api.groupdocs.com/v2.0")) {
+                                <iframe src = "https://dev-apps.groupdocs.com/document-annotation2/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+                            } else if(Model["basePath"].Equals("https://stage-api.groupdocs.com/v2.0")) {
+                                <iframe src = "https://stage-apps.groupdocs.com/document-annotation2/embed/@Model["guid"]" frameborder="0" width="700" height="700"></iframe>
+                            }
+                         }
                    </div>
             }
         }
@@ -121,6 +151,58 @@
     @Html.Partial("links")
 
   <script type="text/javascript">
+     
+        function display(_element_id) {
+
+            if (_element_id == "guid") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "inline";
+                element6.style.display = "inline";
+
+            }
+
+            if (_element_id == "local") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+
+            }
+
+            if (_element_id == "url") {
+                var element1 = document.getElementById("url");
+                var element2 = document.getElementById("urlfield");
+                var element3 = document.getElementById("file");
+                var element4 = document.getElementById("filefield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+            }
+
+        }
+
       function show_hide(_element_id) {
 
           if (_element_id == "point") {

@@ -38,22 +38,43 @@
         <br />
         <input type='text', name='private_key'  value="" />
         <br /> 
-        <label for='private_key'>FileID</label>
+        <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
+       <br />
+       <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
+       <br />
+       <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
+       <br />
+       <br /> 
+       <label for='private_key' id="guid">File ID (GUID)</label>
+       <br />
+       <input type='text' name='fileId'  id="guidfield" value="" />
+       <br />
+       <label for='private_key' style="display:none;" id="url">Upload file from URL</label>
         <br />
-        <input type='text', name='fileId'  value="" />
+        <input type='text' name='url'  value="" id="urlfield" style="display:none;" />
+        <label for='file' id="file" style="display:none;">Upload local file</label>
+        <br />
+        <input type='file' name='file' id="filefield" style="display:none;" />
         <br />
         <label for='private_key'>Email</label>
         <br />
         <input type='text', name='email'  value="" />
         <br />
+        <label for='server_type'>Base Path <font color="grey">(Optional)</font></label>
+         <br />
+        <input name="server_type" id="server_type" />
+        <br />
         <input type='submit' value='Make Request'/>
    }
      </div>
-        @if (Model != null) {
+        @if (Model != null)
+        {
             if (Model["error"] != null)
             {
                 @Model["error"]
-            } else {
+            }
+            else
+            {
                     <div  style="padding:20px; border:1px solid black;">
                        <p><h3><font color="green">Document shared to user with e-mail <h1>@Model["sharer"]</h1></font></h3>
                    </div>
@@ -63,5 +84,57 @@
 </div>
 
     @Html.Partial("links")
+    <script type="text/javascript">
+        function display(_element_id) {
+
+            if (_element_id == "guid") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "inline";
+                element6.style.display = "inline";
+
+            }
+
+            if (_element_id == "local") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+
+            }
+
+            if (_element_id == "url") {
+                var element1 = document.getElementById("url");
+                var element2 = document.getElementById("urlfield");
+                var element3 = document.getElementById("file");
+                var element4 = document.getElementById("filefield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+            }
+
+        }
+</script>
 </body>
 </html>

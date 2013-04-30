@@ -153,7 +153,7 @@ namespace SamplesApp.Controllers
                 Groupdocs.Api.Contract.UploadRequestResult upload = null;
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || Request.Files == null)
+                if (userId == null || private_key == null )
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -1769,12 +1769,16 @@ namespace SamplesApp.Controllers
                 System.Collections.Hashtable result = new System.Collections.Hashtable();
                 String userId = Request.Form["client_id"];
                 String private_key = Request.Form["private_key"];
+                String basePath = Request.Form["server_type"];
+                String url = Request.Form["url"];
+                decimal Id = new decimal();
+                String name = "";
                 result.Add("client_id", userId);
                 result.Add("private_key", private_key);
                 Groupdocs.Api.Contract.UploadRequestResult upload = null;
                 String message = null;
                 // Check is all needed fields are entered
-                if (userId == null || private_key == null || Request.Files == null)
+                if (userId == null || private_key == null)
                 {
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
@@ -1784,63 +1788,103 @@ namespace SamplesApp.Controllers
                 }
                 else
                 {
-                    // Create service for Groupdocs account
-                    GroupdocsService service = new GroupdocsService("https://api.groupdocs.com/v2.0", userId, private_key);
-                    //### Upload file
-                    // Get tag's names from form
-                    foreach (string inputTagName in Request.Files)
+                    if (basePath == "")
                     {
-                        var file = Request.Files[inputTagName];
-                        // Check that file is not fake.
-                        if (file.ContentLength > 0)
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    result.Add("basePath", basePath);
+                    if (url.Equals(""))
+                    {
+                        //### Upload file
+                        // Get tag's names from form
+                        foreach (string inputTagName in Request.Files)
                         {
-                            // Upload file with empty description.
-                            upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
-                            // Check is upload successful
-                            if (upload.Id != null)
+                            var file = Request.Files[inputTagName];
+                            // Check that file is not fake.
+                            if (file.ContentLength > 0)
                             {
-                                //Compress uploaded file into "zip" archive
-                                decimal Id = service.CompressFile(upload.Id, Groupdocs.Common.ArchiveType.Zip);
-                               if (Id != null)
-                               {
-                                   //Get all files from account
-                                   Groupdocs.Api.Contract.ListEntitiesResult files = service.GetFileSystemEntities("", 0, -1, null, true, null, null);
-                                   String name = "";
-                                   //Check if request return data
-                                   if (files.Files.Length != 0)
-                                   {
-                                       //Get Name and Id of compresed file
-                                       for (int i = 0; i < files.Files.Length; i++)
-                                       {
-                                           if (files.Files[i].Id == Id)
-                                           {
-                                               name = files.Files[i].Name;
-                                           }
-                                       }
-                                       //If file uploaded and compresed return message with file name to the template
-                                       result.Add("message", "Archive created and saved successfully as " + name);
-                                       return View("Sample17", null, result);
-                                   }
-                                   else
-                                   {
-                                       //If file GuId is empty return error
-                                       result.Add("error", "File Name is empty");
-                                       return View("Sample17", null, result);
-                                   }
-                               }
-                            }
-                            // If upload was failed return error
-                            else
-                            {
-                                message = "UploadFile returns error";
-                                result.Add("error", message);
-                                return View("Sample17", null, result);
+                                // Upload file with empty description.
+                                upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                                // Check is upload successful
+                                if (upload.Guid != null)
+                                {
+                                    Id = upload.Id;
+                                    name = upload.AdjustedName;
+
+                                }
+                                // If upload was failed return error
+                                else
+                                {
+                                    message = "UploadFile returns error";
+                                    result.Add("error", message);
+                                    return View("Sample17", null, result);
+                                }
                             }
                         }
                     }
-                    // Redirect to viewer with received data
-                    return View("Sample17", null, result);
+                    if (!url.Equals(""))
+                    {
+                        //Make request to upload file from entered Url
+                        String uploadUrl = service.UploadUrl(url);
+                        if (!uploadUrl.Equals(""))
+                        {
+                            //Get all files from account
+                            Groupdocs.Api.Contract.ListEntitiesResult files = service.GetFileSystemEntities("My Web Documents", 0, -1, null, true, null, null);
+
+                            //Check if request return data
+                            if (files.Files.Length != 0)
+                            {
+                                //Get Name and Id of compresed file
+                                for (int i = 0; i < files.Files.Length; i++)
+                                {
+                                    if (files.Files[i].Guid == uploadUrl)
+                                    {
+                                        Id = files.Files[i].Id;
+                                        name = files.Files[i].Name;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                //If file GuId is empty return error
+                                result.Add("error", "File Name is empty");
+                                return View("Sample17", null, result);
+                            }
+                        }
+
+                    }
+                    //Compress uploaded file into "zip" archive
+                    decimal convertId = service.CompressFile(Id, Groupdocs.Common.ArchiveType.Zip);
+                    //Get all files from account
+                    Groupdocs.Api.Contract.ListEntitiesResult filesList = service.GetFileSystemEntities("", 0, -1, null, true, null, null);
+
+                    //Check if request return data
+                    if (filesList.Files.Length != 0)
+                    {
+                        //Get Name and Id of compresed file
+                        for (int i = 0; i < filesList.Files.Length; i++)
+                        {
+                            if (filesList.Files[i].Id == convertId)
+                            {
+                                name = filesList.Files[i].Name;
+                            }
+                        }
+                        //If file uploaded and compresed return message with file name to the template
+                        result.Add("message", "Archive created and saved successfully as " + name);
+                        return View("Sample17", null, result);
+                    }
+                    else
+                    {
+                        //If file GuId is empty return error
+                        result.Add("error", "File Name is empty");
+                           
+                    }
+
                 }
+                return View("Sample17", null, result);
             }
             // If data not posted return to template for filling of necessary fields
             else

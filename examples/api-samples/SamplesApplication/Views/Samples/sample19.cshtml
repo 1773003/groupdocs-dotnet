@@ -15,7 +15,8 @@
    <span class="description"><i>This sample will show how to Compare documents using .NET SDK</i></span> <br/><br />
    <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_299">Docs for this sample</a></span><br /><br/>
    <p>You entered:
-        @if (Model != null) {
+        @if (Model != null)
+        {
            <p>ClientID = @Model["client_id"]</p>
            <p>PrivateKey = @Model["private_key"]</p>
            <p>Source file Id = @Model["sourceFileId"]</p>
@@ -27,27 +28,79 @@
 
    <div id="requestForm" style="padding:20px; border:1px solid black;">
    <p> Enter data for request and press "Make request" button </p>
-   @using (Html.BeginForm("sample19", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" })){
+   @using (Html.BeginForm("sample19", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
         <label for='client_id'>GroupDocs Client ID</label><br />
         <input type='text', name='client_id' value="" /><br />
         <label for='private_key'>GroupDocs Private Key</label><br />
         <input type='text', name='private_key'  value="" /><br /> 
-        <label for='sourceFileId'>sourceFileId</label><br />
-        <input type='text', name='sourceFileId'  value="" /><br />
-        <label for='targetFileId'>targetFileId</label><br />
-        <input type='text', name='targetFileId'  value="" /><br />
+        <table style="width:400px;">
+                <tr style="background:#7FFFD4;"><td width="200">Source file</td><td>Target file</td></tr>
+                <tr>
+                    <td >
+                        <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
+                    </td>
+                    <td>
+                        <input type="radio" name="target" value="guid" id="target_id" onClick="display('target_guid');" checked>File ID (GUID) </input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
+                    </td>
+                    <td>
+                        <input type="radio" name="target" value="local" id="target_localField" onClick="display('target_local');" >Upload local file </input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
+                    </td>
+                    <td>
+                        <input type="radio" name="target" value="target_url" id="target_urlField" onClick="display('target_url');" >Upload file from URL </input>
+                    </td>
+                </tr>
+            </table>
+            <label for='sourceFileId' id="guid">sourceFileId</label>
+            <br />
+            <input type='text' id="guidfield" name='sourceFileId'  value="" />
+            
+            <label for='file' id="file" style="display:none;">Local file</label>
+            <br />
+            <input type='file' name='file' id="filefield" style="display:none;" />
+
+            <label for='private_key' style="display:none;" id="url">File URL</label>
+            <br />
+            <input type='text' name='url'  value="" id="urlfield" style="display:none;" />
+            <br />
+            
+            <label for='targetFileId' id="target_guid">targetFileId</label>
+            <br />
+            <input type='text' id="target_guidfield" name='targetFileId'  value="" />
+           
+            <label for='file' id="target_file" style="display:none;">Local file</label>
+            <br />
+            <input type='file' name='target_file' id="target_filefield" style="display:none;" />
+
+            <label for='private_key' style="display:none;" id="target_url">File URL</label>
+            <br />
+            <input type='text' name='target_url'  value="" id="target_urlfield" style="display:none;" />
+            <br />
         <label for='callbackUrl'>callbackUrl</label><br />
-        if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"]))){
+       if ((Model != null) && (!String.IsNullOrEmpty((String)Model["callback"])))
+       {
             <input type='text', name='callback'  value="@Model["callback"]" size="70" />
-        }else{
+       }
+       else
+       {
             <input type='text', name='callback'  value="" size="70" />
-        }<br />
-        <label for='server_type'>Choose Server</label><br />
-        <select name="server_type" id="server_type">
-            <option selected value="https://api.groupdocs.com/v2.0">Prod</option>
-            <option value="https://dev-api.groupdocs.com/v2.0">Dev</option>
-            <option value="https://stage-api.groupdocs.com/v2.0">Stage</option>
-        </select><br />
+       }
+       <br />
+       
+        <label for='server_type'>Base path<span class="optional">(Optional)</span></label>
+        <br />
+        <input type ="text" name="server_type" id="server_type" />
+        <br />
         <input type='submit' value='Make Request'/>
         <span id="results_status" style="color:red;display:none;"> (Please wait for ajax response) </span>
         <div id="link"></div>
@@ -105,6 +158,103 @@
                     dataType: "text"
                 });
             }
+        }
+
+        function display(_element_id) {
+
+            if (_element_id == "guid") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "inline";
+                element6.style.display = "inline";
+
+            }
+
+            if (_element_id == "local") {
+                var element1 = document.getElementById("file");
+                var element2 = document.getElementById("filefield");
+                var element3 = document.getElementById("url");
+                var element4 = document.getElementById("urlfield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+
+            }
+
+            if (_element_id == "url") {
+                var element1 = document.getElementById("url");
+                var element2 = document.getElementById("urlfield");
+                var element3 = document.getElementById("file");
+                var element4 = document.getElementById("filefield");
+                var element5 = document.getElementById("guid");
+                var element6 = document.getElementById("guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+            }
+            if (_element_id == "target_guid") {
+                var element1 = document.getElementById("target_file");
+                var element2 = document.getElementById("target_filefield");
+                var element3 = document.getElementById("target_url");
+                var element4 = document.getElementById("target_urlfield");
+                var element5 = document.getElementById("target_guid");
+                var element6 = document.getElementById("target_guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "inline";
+                element6.style.display = "inline";
+
+            }
+
+            if (_element_id == "target_local") {
+                var element1 = document.getElementById("target_file");
+                var element2 = document.getElementById("target_filefield");
+                var element3 = document.getElementById("target_url");
+                var element4 = document.getElementById("target_urlfield");
+                var element5 = document.getElementById("target_guid");
+                var element6 = document.getElementById("target_guidfield");
+                element1.style.display = "inline";
+                element2.style.display = "inline";
+                element3.style.display = "none";
+                element4.style.display = "none";
+                element5.style.display = "none";
+                element6.style.display = "none";
+
+            }
+
+            if (_element_id == "target_url") {
+                var element1 = document.getElementById("target_file");
+                var element2 = document.getElementById("target_filefield");
+                var element3 = document.getElementById("target_url");
+                var element4 = document.getElementById("target_urlfield");
+                var element5 = document.getElementById("target_guid");
+                var element6 = document.getElementById("target_guidfield");
+                element1.style.display = "none";
+                element2.style.display = "none";
+                element3.style.display = "inline";
+                element4.style.display = "inline";
+                element5.style.display = "none";
+                element6.style.display = "none";
+            }
+
         }
     </script>
 </body>

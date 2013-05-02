@@ -2615,7 +2615,6 @@ namespace SamplesApp.Controllers
                 result.Add("email", email);
                 result.Add("firstName", firstName);
                 result.Add("lastName", lastName);
-                result.Add("basePath", basePath);
                 String message = null;
                 // Check is all needed fields are entered
                 if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key) || String.IsNullOrEmpty(email)
@@ -2633,6 +2632,7 @@ namespace SamplesApp.Controllers
                     {
                         basePath = "https://api.groupdocs.com/v2.0";
                     }
+                    result.Add("basePath", basePath);
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
 

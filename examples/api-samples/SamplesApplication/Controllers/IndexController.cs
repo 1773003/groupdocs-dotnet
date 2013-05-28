@@ -2231,7 +2231,7 @@ namespace SamplesApp.Controllers
                     //Compare two documents and setting collback Url
                     Groupdocs.Api.Comparison.Contract.CompareResponse compare = service.Compare(sourceFileId, targetFileId, callback);
 
-                    if (!compare.Status.Equals("Failed"))
+                    if (compare.Status.Equals("Completed") || compare.Status.Equals("Archived"))
                     {
                         //Delay necessary that the inquiry would manage to be processed
                         System.Threading.Thread.Sleep(5000);
@@ -2515,6 +2515,7 @@ namespace SamplesApp.Controllers
                                 if (storageInfo.Files[i].Guid == guid)
                                 {
                                     fileName = storageInfo.Files[i].Name;
+                                   
                                 }
 
                             }
@@ -2549,23 +2550,65 @@ namespace SamplesApp.Controllers
                             }
                             //Add recipient to envelope
                             Groupdocs.Api.Contract.SignatureEnvelopeRecipientResponse addRecipient = service.AddEnvelopeRecipient(envelop.Result.Envelope.Id, email, name, lastName, roleId, dec);
-                            //Send envelop with callback url
-                            Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
-                            //Check is envelope send status
-                            if (send.Status.Equals("Ok"))
+                            if (addRecipient.Status.Equals("Ok"))
                             {
-                                //Set data for template
-                                result.Add("envelop", envelop.Result.Envelope.Id);
-                                result.Add("recipient", addRecipient.Result.Recipient.Id);
-                                return View("Sample21", null, result);
+                                Groupdocs.Api.Contract.SignatureEnvelopeDocumentsResponse getDocuments = service.GetEnvelopeDocuments(envelop.Result.Envelope.Id);
+                                if (getDocuments.Status.Equals("Ok"))
+                                {
+                                    Groupdocs.Api.Contract.SignatureEnvelopeFieldsResponse getFields = service.GetEnvelopeFields(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id);
+                                    if (getFields.Status.Equals("Ok"))
+                                    {
+                                        Groupdocs.Api.Contract.SignatureEnvelopeFieldInfo[] fieldInfo = getFields.Result.Fields;
+                                        if (fieldInfo.Length == 0)
+                                        {
+                                            result.Add("error", "You use a wrong file, it's don't content any fields for sign");
+                                            return View("Sample21", null, result);
+                                        }
+                                        for (int n = 0; n < fieldInfo.Length; n++)
+                                        {
+                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings fieldsSettings = new Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings();
+                                            fieldsSettings.Name = fieldInfo[n].Name;
+                                            fieldsSettings.LocationHeight = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationHeight);
+                                            fieldsSettings.LocationWidth = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationWidth);
+                                            fieldsSettings.LocationX = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationX);
+                                            fieldsSettings.LocationY = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationY);
+                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldResponse addFields = service.AddEnvelopeField(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id, fieldInfo[n].Id, fieldsSettings);
+                                        }
+                                        //Send envelop with callback url
+                                        Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
+                                        //Check is envelope send status
+                                        if (send.Status.Equals("Ok"))
+                                        {
+                                            //Set data for template
+                                            result.Add("envelop", envelop.Result.Envelope.Id);
+                                            result.Add("recipient", addRecipient.Result.Recipient.Id);
+                                            return View("Sample21", null, result);
+                                        }
+                                        //If status failed set error for template
+                                        else
+                                        {
+                                            result.Add("error", send.ErrorMessage);
+                                            return View("Sample21", null, result);
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        result.Add("error", getFields.ErrorMessage);
+                                        return View("Sample21", null, result);
+                                    }
+                                }
+                                else
+                                {
+                                    result.Add("error", getDocuments.ErrorMessage);
+                                    return View("Sample21", null, result);
+                                }
                             }
-                            //If status failed set error for template
                             else
                             {
-                                result.Add("error", send.ErrorMessage);
+                                result.Add("error", addRecipient.ErrorMessage);
                                 return View("Sample21", null, result);
                             }
-                           
                         }
                         //If envelope wasn't created send error
                         else

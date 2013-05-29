@@ -2412,8 +2412,7 @@ namespace SamplesApp.Controllers
                 result.Add("email", email);
                 result.Add("firstName", name);
                 result.Add("lastName", lastName);
-                result.Add("basePath", basePath);
-
+                
                 // Check if callback is not empty
                 if (!String.IsNullOrEmpty(callback))
                 {
@@ -2439,6 +2438,7 @@ namespace SamplesApp.Controllers
                     {
                         basePath = "https://api.groupdocs.com/v2.0";
                     }
+                    result.Add("basePath", basePath);
                     // Create service for Groupdocs account
                     GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
                     //if URL to web file was provided - upload the file from Web and get it's GUID
@@ -3019,7 +3019,7 @@ namespace SamplesApp.Controllers
                     if (file.FileName != "")
                     {
                         //Upload local file 
-                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, "uploaded", file.InputStream);
                         if (upload.Guid != null)
                         {
                             //If file uploaded return his guid

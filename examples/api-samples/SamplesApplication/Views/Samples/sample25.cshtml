@@ -37,20 +37,20 @@
             <br />
             <input type='text', name='private_key'  value="" />
             <br />
-            <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" checked>File ID (GUID) </input>
+            <input type="radio" name="sourse" value="guid" id="id" onClick="display('guid');" >File ID (GUID) </input>
             <br />
-            <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" >Upload local file </input>
+            <input type="radio" name="sourse" value="local" id="localField" onClick="display('local');" checked>Upload local file </input>
             <br />
             <input type="radio" name="sourse" value="url" id="urlField" onClick="display('url');" >Upload file from URL </input>
             <br />
             
-            <label for='private_key' id="guid">GroupDocs fileID</label>
+            <label for='private_key' id="guid" style="display:none;">GroupDocs fileID</label>
             <br />
-            <input type='text' name='fileId' id="guidfield" value="" />
+            <input type='text' name='fileId' id="guidfield" value="" style="display:none;" />
             
-            <label for='file' id="file" style="display:none;">Local file</label>
+            <label for='file' id="file" >Local file</label>
             <br />
-            <input type='file' name='file' id="filefield" style="display:none;" />
+            <input type='file' name='file' id="filefield"  />
 
             <label for='private_key' style="display:none;" id="url">File URL</label>
             <br />

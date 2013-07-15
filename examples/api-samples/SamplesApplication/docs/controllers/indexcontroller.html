@@ -7030,7 +7030,7 @@ Check is chosen local file</p>
 						<td class="code">
 							<pre><code class='prettyprint'>                    Groupdocs.Api.Comparison.Contract.CompareResponse compare = service.Compare(sourceFileId, targetFileId, callback);
 
-                    if (!compare.Status.Equals(&quot;Failed&quot;))
+                    if (compare.Status.Equals(&quot;Completed&quot;) || compare.Status.Equals(&quot;Archived&quot;))
                     {
 </code></pre>
 						</td>
@@ -7520,8 +7520,7 @@ Check is chosen local file</p>
                 result.Add(&quot;email&quot;, email);
                 result.Add(&quot;firstName&quot;, name);
                 result.Add(&quot;lastName&quot;, lastName);
-                result.Add(&quot;basePath&quot;, basePath);
-
+                
 </code></pre>
 						</td>
 					</tr>
@@ -7591,6 +7590,7 @@ Check is chosen local file</p>
                     {
                         basePath = &quot;https://api.groupdocs.com/v2.0&quot;;
                     }
+                    result.Add(&quot;basePath&quot;, basePath);
 </code></pre>
 						</td>
 					</tr>
@@ -7810,6 +7810,7 @@ Check is chosen local file</p>
                                 if (storageInfo.Files[i].Guid == guid)
                                 {
                                     fileName = storageInfo.Files[i].Name;
+                                   
                                 }
 
                             }
@@ -7899,6 +7900,30 @@ Check is chosen local file</p>
 						</td>
 						<td class="code">
 							<pre><code class='prettyprint'>                            Groupdocs.Api.Contract.SignatureEnvelopeRecipientResponse addRecipient = service.AddEnvelopeRecipient(envelop.Result.Envelope.Id, email, name, lastName, roleId, dec);
+                            if (addRecipient.Status.Equals(&quot;Ok&quot;))
+                            {
+                                Groupdocs.Api.Contract.SignatureEnvelopeDocumentsResponse getDocuments = service.GetEnvelopeDocuments(envelop.Result.Envelope.Id);
+                                if (getDocuments.Status.Equals(&quot;Ok&quot;))
+                                {
+                                    Groupdocs.Api.Contract.SignatureEnvelopeFieldsResponse getFields = service.GetEnvelopeFields(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id);
+                                    if (getFields.Status.Equals(&quot;Ok&quot;))
+                                    {
+                                        Groupdocs.Api.Contract.SignatureEnvelopeFieldInfo[] fieldInfo = getFields.Result.Fields;
+                                        if (fieldInfo.Length == 0)
+                                        {
+                                            result.Add(&quot;error&quot;, &quot;You use a wrong file, it&#39;s don&#39;t content any fields for sign&quot;);
+                                            return View(&quot;Sample21&quot;, null, result);
+                                        }
+                                        for (int n = 0; n &lt; fieldInfo.Length; n++)
+                                        {
+                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings fieldsSettings = new Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings();
+                                            fieldsSettings.Name = fieldInfo[n].Name;
+                                            fieldsSettings.LocationHeight = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationHeight);
+                                            fieldsSettings.LocationWidth = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationWidth);
+                                            fieldsSettings.LocationX = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationX);
+                                            fieldsSettings.LocationY = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationY);
+                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldResponse addFields = service.AddEnvelopeField(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id, fieldInfo[n].Id, fieldsSettings);
+                                        }
 </code></pre>
 						</td>
 					</tr>
@@ -7911,7 +7936,7 @@ Check is chosen local file</p>
 
 						</td>
 						<td class="code">
-							<pre><code class='prettyprint'>                            Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
+							<pre><code class='prettyprint'>                                        Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
 </code></pre>
 						</td>
 					</tr>
@@ -7924,8 +7949,8 @@ Check is chosen local file</p>
 
 						</td>
 						<td class="code">
-							<pre><code class='prettyprint'>                            if (send.Status.Equals(&quot;Ok&quot;))
-                            {
+							<pre><code class='prettyprint'>                                        if (send.Status.Equals(&quot;Ok&quot;))
+                                        {
 </code></pre>
 						</td>
 					</tr>
@@ -7938,10 +7963,10 @@ Check is chosen local file</p>
 
 						</td>
 						<td class="code">
-							<pre><code class='prettyprint'>                                result.Add(&quot;envelop&quot;, envelop.Result.Envelope.Id);
-                                result.Add(&quot;recipient&quot;, addRecipient.Result.Recipient.Id);
-                                return View(&quot;Sample21&quot;, null, result);
-                            }
+							<pre><code class='prettyprint'>                                            result.Add(&quot;envelop&quot;, envelop.Result.Envelope.Id);
+                                            result.Add(&quot;recipient&quot;, addRecipient.Result.Recipient.Id);
+                                            return View(&quot;Sample21&quot;, null, result);
+                                        }
 </code></pre>
 						</td>
 					</tr>
@@ -7954,12 +7979,30 @@ Check is chosen local file</p>
 
 						</td>
 						<td class="code">
-							<pre><code class='prettyprint'>                            else
+							<pre><code class='prettyprint'>                                        else
+                                        {
+                                            result.Add(&quot;error&quot;, send.ErrorMessage);
+                                            return View(&quot;Sample21&quot;, null, result);
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        result.Add(&quot;error&quot;, getFields.ErrorMessage);
+                                        return View(&quot;Sample21&quot;, null, result);
+                                    }
+                                }
+                                else
+                                {
+                                    result.Add(&quot;error&quot;, getDocuments.ErrorMessage);
+                                    return View(&quot;Sample21&quot;, null, result);
+                                }
+                            }
+                            else
                             {
-                                result.Add(&quot;error&quot;, send.ErrorMessage);
+                                result.Add(&quot;error&quot;, addRecipient.ErrorMessage);
                                 return View(&quot;Sample21&quot;, null, result);
                             }
-                           
                         }
 </code></pre>
 						</td>
@@ -8086,7 +8129,6 @@ Check is chosen local file</p>
                 result.Add(&quot;email&quot;, email);
                 result.Add(&quot;firstName&quot;, firstName);
                 result.Add(&quot;lastName&quot;, lastName);
-                result.Add(&quot;basePath&quot;, basePath);
                 String message = null;
 </code></pre>
 						</td>
@@ -8126,6 +8168,7 @@ Check is chosen local file</p>
                     {
                         basePath = &quot;https://api.groupdocs.com/v2.0&quot;;
                     }
+                    result.Add(&quot;basePath&quot;, basePath);
 </code></pre>
 						</td>
 					</tr>
@@ -9283,7 +9326,7 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 
 						</td>
 						<td class="code">
-							<pre><code class='prettyprint'>                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+							<pre><code class='prettyprint'>                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, &quot;uploaded&quot;, file.InputStream);
                         if (upload.Guid != null)
                         {
 </code></pre>
@@ -9736,6 +9779,874 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 							<div class="pilwrap">
 								<a class="pilcrow" href="#section_601">&#182;</a>
 							</div>
+							<h3><i>This sample will show how to use <b>Signer object</b> to be authorized at GroupDocs and how to get GroupDocs user infromation using .NET SDK</i></h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>        public ActionResult Sample26()
+        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_602">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_602">&#182;</a>
+							</div>
+							<p>Check is data posted    </p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>            if (Request.HttpMethod == &quot;POST&quot;)
+            {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_603">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_603">&#182;</a>
+							</div>
+							<h3>Set variables and get POST data</h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String login = Request.Form[&quot;login&quot;];
+                String password = Request.Form[&quot;password&quot;];
+                Groupdocs.Api.Contract.UserInfoResult userInfo = null;
+                String message = null;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_604">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_604">&#182;</a>
+							</div>
+							<p>Check is all needed fields are entered</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                if (login == null || password == null)
+                {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_605">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_605">&#182;</a>
+							</div>
+							<p>If not all fields entered send error message</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    message = &quot;Please enter all parameters&quot;;
+                    result.Add(&quot;error&quot;, message);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_606">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_606">&#182;</a>
+							</div>
+							<p>Transfer error message to template</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    return View(&quot;Sample26&quot;, null, result);
+                }
+                else
+                {
+                    String basePath = Request.Form[&quot;server_type&quot;];
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_607">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_607">&#182;</a>
+							</div>
+							<p>Check is base path entered</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (basePath.Equals(&quot;&quot;))
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_608">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_608">&#182;</a>
+							</div>
+							<p>If base path empty set base path to the dev server</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        basePath = &quot;https://api.groupdocs.com/v2.0&quot;;
+                    }
+                    result.Add(&quot;basePath&quot;, basePath);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_609">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_609">&#182;</a>
+							</div>
+							<p>Create service for Groupdocs account</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    GroupdocsService service = new GroupdocsService(basePath, &quot;123&quot;, &quot;123&quot;);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_610">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_610">&#182;</a>
+							</div>
+							<p>Get info about user account</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    userInfo = service.CreateUserLogin(login, password);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_611">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_611">&#182;</a>
+							</div>
+							<h3>Put user info to Hashtable</h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    result.Add(&quot;FirstName&quot;, userInfo.User.FirstName);
+                    result.Add(&quot;LastName&quot;, userInfo.User.LastName);
+                    result.Add(&quot;NickName&quot;, userInfo.User.NickName);
+                    result.Add(&quot;PrimaryEmail&quot;, userInfo.User.PrimaryEmail);
+                    result.Add(&quot;guid&quot;, userInfo.User.Guid);
+                    result.Add(&quot;pkey&quot;, userInfo.User.PrivateKey);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_612">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_612">&#182;</a>
+							</div>
+							<p>Return Hashtable with results to the template</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    return View(&quot;Sample26&quot;, null, result);
+                }
+            }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_613">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_613">&#182;</a>
+							</div>
+							<p>If data not posted return to template for filling of necessary fields</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>            else
+            {
+                return View(&quot;Sample26&quot;);
+            }
+        }
+
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_614">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_614">&#182;</a>
+							</div>
+							<h3><i>This sample will show how to create your own questionary using forms and show the result document</i></h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>        public ActionResult Sample27()
+        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_615">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_615">&#182;</a>
+							</div>
+							<p>Check is data posted </p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>            if (Request.HttpMethod == &quot;POST&quot;)
+            {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_616">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_616">&#182;</a>
+							</div>
+							<h3>Set variables and get POST data</h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form[&quot;client_id&quot;];
+                String private_key = Request.Form[&quot;private_key&quot;];
+                String fileId = Request.Form[&quot;fileId&quot;];
+                String url = Request.Form[&quot;url&quot;];
+                String name = Request.Form[&quot;name&quot;];
+                String sex = Request.Form[&quot;sex&quot;];
+                String age = Request.Form[&quot;age&quot;];
+                String sunrise = Request.Form[&quot;sunrise&quot;];
+                String resultType = Request.Form[&quot;type&quot;];
+                String fileGuId = &quot;&quot;;
+                var file = Request.Files[&quot;file&quot;];
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_617">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_617">&#182;</a>
+							</div>
+							<p>Set entered data to the results list</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                result.Add(&quot;client_id&quot;, userId);
+                result.Add(&quot;private_key&quot;, private_key);
+                result.Add(&quot;name&quot;, name);
+                result.Add(&quot;sex&quot;, sex);
+                result.Add(&quot;age&quot;, age);
+                result.Add(&quot;sunrise&quot;, sunrise);
+                result.Add(&quot;type&quot;, resultType);
+                String message = null;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_618">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_618">&#182;</a>
+							</div>
+							<p>Check is all needed fields are entered</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(private_key))
+                {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_619">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_619">&#182;</a>
+							</div>
+							<p>If not all fields entered send error message</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    message = &quot;Please enter all parameters&quot;;
+                    result.Add(&quot;error&quot;, message);
+                    return View(&quot;Sample27&quot;, null, result);
+                }
+                else
+                {
+                    String basePath = Request.Form[&quot;server_type&quot;];
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_620">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_620">&#182;</a>
+							</div>
+							<p>Check is base path entered</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (basePath.Equals(&quot;&quot;))
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_621">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_621">&#182;</a>
+							</div>
+							<p>If base path empty set base path to the dev server</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        basePath = &quot;https://api.groupdocs.com/v2.0&quot;;
+                    }
+                    result.Add(&quot;basePath&quot;, basePath);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_622">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_622">&#182;</a>
+							</div>
+							<p>Create service for Groupdocs account</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_623">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_623">&#182;</a>
+							</div>
+							<p>Make request to get document pages as images
+if URL to web file was provided - upload the file from Web and get it's GUID</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (url != &quot;&quot;)
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_624">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_624">&#182;</a>
+							</div>
+							<p>Make request to upload file from entered Url</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        String guid = service.UploadUrl(url);
+                        if (guid != null)
+                        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_625">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_625">&#182;</a>
+							</div>
+							<p>If file uploaded return his GuId</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            fileGuId = guid;
+
+                        }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_626">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_626">&#182;</a>
+							</div>
+							<p>If file wasn't uploaded return error</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        else
+                        {
+                            result.Add(&quot;error&quot;, &quot;Something wrong with entered data&quot;);
+                            return View(&quot;Sample27&quot;, null, result);
+                        }
+                    }
+
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_627">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_627">&#182;</a>
+							</div>
+							<p>if file was uploaded locally - upload the file and get it's GUID</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (file.FileName != &quot;&quot;)
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_628">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_628">&#182;</a>
+							</div>
+							<p>Upload local file </p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        Groupdocs.Api.Contract.UploadRequestResult upload = service.UploadFile(file.FileName, &quot;uploaded&quot;, file.InputStream);
+                        if (upload.Guid != null)
+                        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_629">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_629">&#182;</a>
+							</div>
+							<p>If file uploaded return his guid</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            fileGuId = upload.Guid;
+                        }
+                        else
+                        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_630">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_630">&#182;</a>
+							</div>
+							<p>If file wasn't uploaded return error</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            result.Add(&quot;error&quot;, &quot;Something wrong with entered data&quot;);
+                            return View(&quot;Sample27&quot;, null, result);
+                        }
+                    }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_631">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_631">&#182;</a>
+							</div>
+							<p>If user choose file guid</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (!fileId.Equals(&quot;&quot;))
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_632">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_632">&#182;</a>
+							</div>
+							<p>Set file guid as entered by user file guid</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        fileGuId = fileId;
+                    }
+                    System.Collections.Hashtable enteredData = new System.Collections.Hashtable();
+                    enteredData.Add(&quot;sex&quot;, sex);
+                    enteredData.Add(&quot;age&quot;, age);
+                    enteredData.Add(&quot;sunrise&quot;, sunrise);
+                    enteredData.Add(&quot;name&quot;, name);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_633">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_633">&#182;</a>
+							</div>
+							<p>Set fileds counter</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    Int32 count = enteredData.Count;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_634">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_634">&#182;</a>
+							</div>
+							<p>Create Datasource object</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    Groupdocs.Api.Contract.Datasource dataSource = new Groupdocs.Api.Contract.Datasource();
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_635">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_635">&#182;</a>
+							</div>
+							<p>Create array of DatasourceField objects</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    Groupdocs.Api.Contract.DatasourceField[] fieldArray = new Groupdocs.Api.Contract.DatasourceField[count];
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_636">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_636">&#182;</a>
+							</div>
+							<p>Create array od objects with</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    object[] values = new object[1];
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_637">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_637">&#182;</a>
+							</div>
+							<p>Set DatasourceFiled data</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    Int32 counter = 0;
+                    foreach (System.Collections.DictionaryEntry fields in enteredData)
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_638">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_638">&#182;</a>
+							</div>
+							<p>Set object array content</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        values.SetValue(System.Convert.ToString(fields.Value), 0);
+                        Groupdocs.Api.Contract.DatasourceField field = new Groupdocs.Api.Contract.DatasourceField();
+                        Groupdocs.Api.Contract.DatasourceFieldType type = new Groupdocs.Api.Contract.DatasourceFieldType();
+                        type = 0;
+                        field.Name = System.Convert.ToString(fields.Key);
+                        field.Type = type;
+                        field.Values = values;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_639">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_639">&#182;</a>
+							</div>
+							<p>Push DatasourceField to array of DatasourceField objects</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        fieldArray.SetValue(field, counter);
+                        counter++;
+                    }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_640">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_640">&#182;</a>
+							</div>
+							<p>Set feilds array to the Datasource</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    dataSource.Fields = fieldArray;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_641">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_641">&#182;</a>
+							</div>
+							<p>Add new Datasource to GroupDocs</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    decimal addDataSource = service.AddDataSource(dataSource);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_642">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_642">&#182;</a>
+							</div>
+							<p>Check is not empty addDataSource</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (!addDataSource.Equals(&quot;&quot;))
+                    {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_643">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_643">&#182;</a>
+							</div>
+							<p>If status ok merge Datasource to new pdf file</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        decimal job = service.MergeTemplate(fileGuId, addDataSource, resultType, false);
+                        if (!job.Equals(&quot;&quot;))
+                        {
+                            Groupdocs.Api.Contract.GetJobDocumentsResult jobInfo = new Groupdocs.Api.Contract.GetJobDocumentsResult();
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_644">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_644">&#182;</a>
+							</div>
+							<h3>Check job status</h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            for (int n = 0; n &lt;= 5; n++)
+                            {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_645">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_645">&#182;</a>
+							</div>
+							<p>Delay necessary that the inquiry would manage to be processed</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                                System.Threading.Thread.Sleep(5000);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_646">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_646">&#182;</a>
+							</div>
+							<p>Make request to api for get document info by job id</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                                jobInfo = service.GetJobDocuments(job);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_647">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_647">&#182;</a>
+							</div>
+							<p>Check job status, if status is Completed or Archived exit from cycle</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                                if (jobInfo.JobStatus.Equals(&quot;Completed&quot;) || jobInfo.JobStatus.Equals(&quot;Archived&quot;))
+                                {
+                                    break;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_648">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_648">&#182;</a>
+							</div>
+							<p>If job status Postponed throw exception with error</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                                }
+                                else if (jobInfo.JobStatus.Equals(&quot;Postponed&quot;))
+                                {
+                                    result.Add(&quot;error&quot;, &quot;Job is fail&quot;);
+                                    return View(&quot;Sample27&quot;, null, result);
+
+                                }
+                            }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_649">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_649">&#182;</a>
+							</div>
+							<p>Get guid</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            String guid = jobInfo.Inputs[0].Outputs[0].Guid;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_650">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_650">&#182;</a>
+							</div>
+							<p>Get name</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            String fileName = jobInfo.Inputs[0].Outputs[0].Name;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_651">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_651">&#182;</a>
+							</div>
+							<p>Definition of folder where to download file</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            String LocalPath = AppDomain.CurrentDomain.BaseDirectory + &quot;downloads/&quot;;
+                            if (!Directory.Exists(LocalPath))
+                            {
+                                DirectoryInfo di = Directory.CreateDirectory(LocalPath);
+                            }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_652">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_652">&#182;</a>
+							</div>
+							<h3>Make a request to Storage Api for dowloading file</h3>
+
+<p>Download file</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            bool download = service.DownloadFile(guid, LocalPath + fileName);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_653">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_653">&#182;</a>
+							</div>
+							<p>If file downloaded successful</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                            if (download != false)
+                            {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_654">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_654">&#182;</a>
+							</div>
+							<p>Put file info to the result's list</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                                result.Add(&quot;message&quot;, &quot;File was converted and downloaded to the &quot; + LocalPath + &quot;/&quot; + fileName);
+                                result.Add(&quot;fileId&quot;, guid);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_655">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_655">&#182;</a>
+							</div>
+							<p>Return to the template </p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                                return View(&quot;Sample27&quot;, null, result);
+                            }
+
+                        }
+                        else
+                        {
+                            result.Add(&quot;error&quot;, &quot;MargeTemplate is fail&quot;);
+                            return View(&quot;Sample27&quot;, null, result);
+                        }
+                    }
+                    else
+                    {
+                        result.Add(&quot;error&quot;, &quot;AddDataSource returned empty job id&quot;);
+                        return View(&quot;Sample27&quot;, null, result);
+                    }                    
+                    return View(&quot;Sample27&quot;, null, result);
+                }
+
+            }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_656">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_656">&#182;</a>
+							</div>
+							<p>If data not posted return to template for filling of necessary fields</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>            else
+            {
+                return View(&quot;Sample27&quot;);
+            }
+        }
+
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_657">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_657">&#182;</a>
+							</div>
 							<h3>Callback check for Sample18</h3>
 
 						</td>
@@ -9747,10 +10658,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_602">
+					<tr id="section_658">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_602">&#182;</a>
+								<a class="pilcrow" href="#section_658">&#182;</a>
 							</div>
 							<p>String fileInfo = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";</p>
 
@@ -9760,10 +10671,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_603">
+					<tr id="section_659">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_603">&#182;</a>
+								<a class="pilcrow" href="#section_659">&#182;</a>
 							</div>
 							<p>String userInfo = System.IO.File.ReadLines(infoFile);</p>
 
@@ -9777,10 +10688,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_604">
+					<tr id="section_660">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_604">&#182;</a>
+								<a class="pilcrow" href="#section_660">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -9799,10 +10710,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_605">
+					<tr id="section_661">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_605">&#182;</a>
+								<a class="pilcrow" href="#section_661">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -9812,10 +10723,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_606">
+					<tr id="section_662">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_606">&#182;</a>
+								<a class="pilcrow" href="#section_662">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -9828,10 +10739,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_607">
+					<tr id="section_663">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_607">&#182;</a>
+								<a class="pilcrow" href="#section_663">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -9845,10 +10756,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_608">
+					<tr id="section_664">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_608">&#182;</a>
+								<a class="pilcrow" href="#section_664">&#182;</a>
 							</div>
 							<p>Definition of folder where to download file</p>
 
@@ -9864,10 +10775,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_609">
+					<tr id="section_665">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_609">&#182;</a>
+								<a class="pilcrow" href="#section_665">&#182;</a>
 							</div>
 							<h3>Make a request to Storage Api for dowloading file</h3>
 
@@ -9882,10 +10793,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_610">
+					<tr id="section_666">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_610">&#182;</a>
+								<a class="pilcrow" href="#section_666">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -9897,10 +10808,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_611">
+					<tr id="section_667">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_611">&#182;</a>
+								<a class="pilcrow" href="#section_667">&#182;</a>
 							</div>
 							<p>String jobId = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt");</p>
 
@@ -9916,10 +10827,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_612">
+					<tr id="section_668">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_612">&#182;</a>
+								<a class="pilcrow" href="#section_668">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -9964,10 +10875,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_613">
+					<tr id="section_669">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_613">&#182;</a>
+								<a class="pilcrow" href="#section_669">&#182;</a>
 							</div>
 							<p>form the link to result file
 result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
@@ -9981,10 +10892,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_614">
+					<tr id="section_670">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_614">&#182;</a>
+								<a class="pilcrow" href="#section_670">&#182;</a>
 							</div>
 							<h3>Callback check for Sample19</h3>
 
@@ -9994,10 +10905,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_615">
+					<tr id="section_671">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_615">&#182;</a>
+								<a class="pilcrow" href="#section_671">&#182;</a>
 							</div>
 							<p>Get user info</p>
 
@@ -10012,10 +10923,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_616">
+					<tr id="section_672">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_616">&#182;</a>
+								<a class="pilcrow" href="#section_672">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -10031,10 +10942,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_617">
+					<tr id="section_673">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_617">&#182;</a>
+								<a class="pilcrow" href="#section_673">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -10044,10 +10955,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_618">
+					<tr id="section_674">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_618">&#182;</a>
+								<a class="pilcrow" href="#section_674">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -10059,10 +10970,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_619">
+					<tr id="section_675">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_619">&#182;</a>
+								<a class="pilcrow" href="#section_675">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -10074,10 +10985,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_620">
+					<tr id="section_676">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_620">&#182;</a>
+								<a class="pilcrow" href="#section_676">&#182;</a>
 							</div>
 							<p>Definition of folder where to download file</p>
 
@@ -10090,10 +11001,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_621">
+					<tr id="section_677">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_621">&#182;</a>
+								<a class="pilcrow" href="#section_677">&#182;</a>
 							</div>
 							<h3>Make a request to Storage Api for dowloading file</h3>
 
@@ -10107,10 +11018,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_622">
+					<tr id="section_678">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_622">&#182;</a>
+								<a class="pilcrow" href="#section_678">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -10124,10 +11035,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_623">
+					<tr id="section_679">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_623">&#182;</a>
+								<a class="pilcrow" href="#section_679">&#182;</a>
 							</div>
 							<h3>Callback check for Sample21</h3>
 
@@ -10137,10 +11048,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_624">
+					<tr id="section_680">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_624">&#182;</a>
+								<a class="pilcrow" href="#section_680">&#182;</a>
 							</div>
 							<p>Get user info</p>
 
@@ -10155,10 +11066,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_625">
+					<tr id="section_681">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_625">&#182;</a>
+								<a class="pilcrow" href="#section_681">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -10174,10 +11085,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_626">
+					<tr id="section_682">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_626">&#182;</a>
+								<a class="pilcrow" href="#section_682">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -10187,10 +11098,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_627">
+					<tr id="section_683">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_627">&#182;</a>
+								<a class="pilcrow" href="#section_683">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -10202,10 +11113,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_628">
+					<tr id="section_684">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_628">&#182;</a>
+								<a class="pilcrow" href="#section_684">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -10217,10 +11128,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_629">
+					<tr id="section_685">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_629">&#182;</a>
+								<a class="pilcrow" href="#section_685">&#182;</a>
 							</div>
 							<p>Definition of folder where to download file</p>
 
@@ -10233,10 +11144,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_630">
+					<tr id="section_686">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_630">&#182;</a>
+								<a class="pilcrow" href="#section_686">&#182;</a>
 							</div>
 							<h3>Make a request to Storage Api for dowloading file</h3>
 
@@ -10250,10 +11161,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_631">
+					<tr id="section_687">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_631">&#182;</a>
+								<a class="pilcrow" href="#section_687">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -10268,10 +11179,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_632">
+					<tr id="section_688">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_632">&#182;</a>
+								<a class="pilcrow" href="#section_688">&#182;</a>
 							</div>
 							<p>Method for file downloading from JS</p>
 
@@ -10291,10 +11202,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_633">
+					<tr id="section_689">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_633">&#182;</a>
+								<a class="pilcrow" href="#section_689">&#182;</a>
 							</div>
 							<p>path to settings file - temporary save userId and apiKey like to property file</p>
 
@@ -10305,10 +11216,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_634">
+					<tr id="section_690">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_634">&#182;</a>
+								<a class="pilcrow" href="#section_690">&#182;</a>
 							</div>
 							<p>open file in rewrite mode</p>
 
@@ -10318,10 +11229,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_635">
+					<tr id="section_691">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_635">&#182;</a>
+								<a class="pilcrow" href="#section_691">&#182;</a>
 							</div>
 							<p>String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";</p>
 
@@ -10331,10 +11242,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_636">
+					<tr id="section_692">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_636">&#182;</a>
+								<a class="pilcrow" href="#section_692">&#182;</a>
 							</div>
 							<p>w = System.IO.File.CreateText(filePath);</p>
 
@@ -10349,10 +11260,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_637">
+					<tr id="section_693">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_637">&#182;</a>
+								<a class="pilcrow" href="#section_693">&#182;</a>
 							</div>
 							<p>check if Downloads folder exists and remove it to clean all old files</p>
 

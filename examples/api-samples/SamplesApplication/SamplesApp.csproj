@@ -251,6 +251,12 @@
   <ItemGroup>
     <Content Include="Views\Samples\sample25.cshtml" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\sample26.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Samples\sample27.cshtml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

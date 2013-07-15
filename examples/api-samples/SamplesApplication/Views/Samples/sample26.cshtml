@@ -1,0 +1,71 @@
+﻿@model System.Collections.Hashtable
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>GroupDocs Sample26</title>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+
+</head>
+<body>
+<h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample26</h3>
+
+<div class='samplecontent' style="padding:10px;">
+   <span class="description"><i>This sample will show how to use Signer object to be authorized at GroupDocs and how to get GroupDocs user infromation using .NET SDK</i></span> <br/>
+   <br />
+   <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_6">Docs for this sample</a></span>
+   <br />
+   <div  style="padding:20px; border:1px solid black;">
+        <p> Results: </p>
+    @if (Model != null) {
+            <table style="border:1px double black;">
+              <tr>
+                  <th>Field</th><th>Value</th>
+              </tr>
+              <tr>
+                   <td>First Name</td><td>@Model["FirstName"]  </td>
+              </tr>
+              <tr>
+                   <td>Last Name</td><td>@Model["LastName"]</td>
+              </tr>
+              <tr>
+                   <td>Nick Name</td><td>@Model["NickName"]</td>
+              </tr>
+              <tr>
+                   <td>Primary Email</td><td>@Model["PrimaryEmail"]</td>
+              </tr>
+             <tr>
+                   <td>GUID</td><td>@Model["guid"]</td>
+              </tr>
+              <tr>
+                   <td>Private key</td><td>@Model["pkey"]</td>
+              </tr>
+            </table>
+        }
+   </div>
+
+   <br/>
+   <div id="requestForm" style="padding:20px; border:1px solid black;">
+   <p> Enter data for request and press "Make request" button </p>
+   @using (Html.BeginForm("sample26", "Samples", FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
+        <label for='login'>Login</label>
+        <br />
+        <input type='text' name='login' value="" />
+        <br />
+        <label for='password'>Password</label>
+        <br />
+        <input type='text' name='password'  value="" />
+        <br />             
+        <label for='server_type'>Base path<span class="optional">(Optional)</span></label>
+        <br />
+        <input type ="text" name="server_type" id="server_type" />
+        <br />
+        <input type='submit' value='Make Request'/>
+   }
+    </div>
+</div>
+
+    @Html.Partial("links")
+</body>
+</html>

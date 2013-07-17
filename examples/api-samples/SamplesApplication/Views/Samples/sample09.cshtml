@@ -11,16 +11,18 @@
 <h3 style="text-align:center;"><a href="/samples">GroupDocs .NET SDK Samples</a> - Sample09</h3>
 
 <div class='samplecontent' style="padding:10px;">
-   <span class="description"><i>This sample will show how to generate an embedded Viewer URL for a Document using .NET SDK</i></span> <br/>
+   <span class="description"><i>This sample will show how to generate an embedded Viewer/Annotation URL for a Document using .NET SDK</i></span> <br/>
    <br />
    <span class="documentation"><a href="/docs/controllers/indexcontroller.html#section_153">Docs for this sample</a></span>
    <br />
    <br/><p>You entered:
-@if (Model != null) {
+@if (Model != null)
+{
  
            <p>File Id = @Model["fileId"]</p>
            <p>Width = @Model["width"]</p>
            <p>Height = @Model["height"]</p>
+           <p>Iframe type = @Model["iframeType"]</p>
            <p><font color="red">@Model["error"]</font></p>
       
 }
@@ -54,6 +56,12 @@
         <label for='file' id="file" style="display:none;">Upload local file</label>
         <br />
         <input type='file' name='file' id="filefield" style="display:none;" />
+        <br />
+       <label for="iframeType">What app you want to generate?  Viewer / Annotation</label>
+        <br />
+        <input type="radio" name="iframeType" value="viewer" checked>Viewer</input>
+        <input type="radio" name="iframeType" value="annotation">Annotation</input>
+        <br />
         <br />
         <label for='private_key'>Width</label>
         <br />

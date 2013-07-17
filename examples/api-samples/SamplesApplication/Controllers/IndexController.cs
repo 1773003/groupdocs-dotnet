@@ -857,10 +857,11 @@ namespace SamplesApp.Controllers
                 String fileId = Request.Form["fileId"];
                 String url = Request.Form["url"];
                 var file = Request.Files["file"];
+                String iframeType = Request.Form["iframeType"];
                 String fileGuId = "";
                 result.Add("width", width);
                 result.Add("height", height);
-                result.Add("fileId", fileId);
+                result.Add("iframeType", iframeType);
                 String message = null;
                 if (userId == null || private_key == null || fileId == null)
                 {
@@ -961,22 +962,47 @@ namespace SamplesApp.Controllers
                         }
                     }
                     String iframe = "";
-                    // Generate Embed viewer url with entered file id
-                    if (basePath.Equals("https://api.groupdocs.com/v2.0"))
+                    result.Add("fileId", fileGuId);
+                    //Chek what type of iframe user select
+                    if (iframeType.Equals("viewer"))
                     {
-                        iframe = "https://apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        // Generate Embed viewer url with entered file id
+                        if (basePath.Equals("https://api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
+                        if (basePath.Equals("https://dev-api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://dev-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
+                        if (basePath.Equals("https://stage-api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://stage-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
+                        if (basePath.Equals("https://realtime-api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://realtime-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
                     }
-                    if (basePath.Equals("https://dev-api.groupdocs.com/v2.0"))
+                    else if (iframeType.Equals("annotation"))
                     {
-                        iframe = "https://dev-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
-                    }
-                    if (basePath.Equals("https://stage-api.groupdocs.com/v2.0"))
-                    {
-                        iframe = "https://stage-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
-                    }
-                    if (basePath.Equals("https://realtime-api.groupdocs.com/v2.0"))
-                    {
-                        iframe = "https://realtime-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        // Generate Embed annotation url with entered file id
+                        if (basePath.Equals("https://api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
+                        if (basePath.Equals("https://dev-api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://dev-apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
+                        if (basePath.Equals("https://stage-api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://stage-apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
+                        if (basePath.Equals("https://realtime-api.groupdocs.com/v2.0"))
+                        {
+                            iframe = "https://realtime-apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                        }
                     }
                     result.Add("iframe", iframe);
                     return View("Sample09", null, result);

@@ -188,6 +188,12 @@ namespace SamplesApp
                                new { controller = "Samples", action = "sample27", result = UrlParameter.Optional } // Parameter defaults
                              );
 
+            routes.MapRoute(
+                               "sample28", // Route name
+                               "{controller}/{action}/{result}", // URL with parameters
+                               new { controller = "Samples", action = "sample28", result = UrlParameter.Optional } // Parameter defaults
+                             );
+
               routes.MapRoute(
                        "compare_callback", // Route name
                        "{controller}/{action}/{result}", // URL with parameters

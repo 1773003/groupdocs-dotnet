@@ -868,7 +868,7 @@ namespace SamplesApp.Controllers
                     // If not all fields entered send error message
                     message = "Please enter all parameters";
                     result.Add("error", message);
-                    return View("Sample08", null, result);
+                    return View("Sample09", null, result);
                 }
                 else
                 {
@@ -3418,6 +3418,89 @@ namespace SamplesApp.Controllers
             else
             {
                 return View("Sample27");
+            }
+        }
+
+        //### <i>This sample will show how to delete all annotations from document</i>
+        public ActionResult Sample28()
+        {
+            // Check is data posted 
+            if (Request.HttpMethod == "POST")
+            {
+                //### Set variables and get POST data
+                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form["client_id"];
+                String private_key = Request.Form["private_key"];
+                String fileId = Request.Form["fileId"];
+                String basePath = Request.Form["server_type"];
+                // Set entered data to the results list
+                result.Add("client_id", userId);
+                result.Add("private_key", private_key);
+                result.Add("fileId", fileId);
+                String error = null;
+                // Check is all needed fields are entered
+                if (userId == null || private_key == null || fileId == null)
+                {
+                    // If not all fields entered send error message
+                    error = "Please enter all parameters";
+                    result.Add("error", error);
+                    return View("Sample28", null, result);
+                }
+                else
+                {
+                    if (basePath == "")
+                    {
+                        basePath = "https://api.groupdocs.com/v2.0";
+                    }
+                    result.Add("basePath", basePath);
+                    // Create service for Groupdocs account
+                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+                    // Get all annotations from document
+                    Groupdocs.Api.Contract.Annotation.ListAnnotationsResult annotations = service.ListAnnotations(fileId);
+                    // If annotations wasn't found return error
+                    if (annotations.Annotations.Length == 0)
+                    {
+
+                        error = "File you are entered contains no annotations";
+                        result.Add("error", error);
+                        return View("Sample28", null, result);
+
+                    }
+                    Groupdocs.Api.Contract.Annotation.DeleteAnnotationResult delAnnot = null;
+                    if (annotations.Annotations.Length != 0)
+                    {
+                        String message = "All annotations deleted successfully";
+                        result.Add("message", message);
+                        //Get annotations data
+                        for (int i = 0; i < annotations.Annotations.Length; i++)
+                        {
+                            delAnnot = service.DeleteAnnotation(annotations.Annotations[i].Guid);
+                       
+                        }
+                    }
+                    String url = "";
+                   //iframe to prodaction server
+                    if (basePath.Equals("https://api.groupdocs.com/v2.0")) {
+                        url = "https://apps.groupdocs.com/document-viewer/embed/" + fileId;
+                        //iframe to dev server
+                    } else if (basePath.Equals("https://dev-api.groupdocs.com/v2.0")) {
+                        url = "https://dev-apps.groupdocs.com/document-viewer/embed/" + fileId;
+                        //iframe to test server
+                    } else if (basePath.Equals("https://stage-api.groupdocs.com/v2.0")) {
+                        url = "https://stage-apps.groupdocs.com/document-viewer/embed/" + fileId;
+                    } else if (basePath.Equals("http://realtime-api.groupdocs.com")) {
+                        url = "http://realtime-apps.groupdocs.com/document-viewer/embed/" + fileId;
+                    }
+                    //Set data for template
+                    result.Add("url", url);
+                    return View("Sample28", null, result);
+                }
+
+            }
+            // If data not posted return to template for filling of necessary fields
+            else
+            {
+                return View("Sample28");
             }
         }
 

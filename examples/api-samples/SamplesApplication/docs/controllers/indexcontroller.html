@@ -3003,7 +3003,7 @@ Pass GUID of the document as model.</p>
 						<td class="code">
 							<pre><code class='prettyprint'>                    message = &quot;Please enter all parameters&quot;;
                     result.Add(&quot;error&quot;, message);
-                    return View(&quot;Sample08&quot;, null, result);
+                    return View(&quot;Sample09&quot;, null, result);
                 }
                 else
                 {
@@ -10695,6 +10695,254 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 							<div class="pilwrap">
 								<a class="pilcrow" href="#section_659">&#182;</a>
 							</div>
+							<h3><i>This sample will show how to delete all annotations from document</i></h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>        public ActionResult Sample28()
+        {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_660">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_660">&#182;</a>
+							</div>
+							<p>Check is data posted </p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>            if (Request.HttpMethod == &quot;POST&quot;)
+            {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_661">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_661">&#182;</a>
+							</div>
+							<h3>Set variables and get POST data</h3>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                System.Collections.Hashtable result = new System.Collections.Hashtable();
+                String userId = Request.Form[&quot;client_id&quot;];
+                String private_key = Request.Form[&quot;private_key&quot;];
+                String fileId = Request.Form[&quot;fileId&quot;];
+                String basePath = Request.Form[&quot;server_type&quot;];
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_662">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_662">&#182;</a>
+							</div>
+							<p>Set entered data to the results list</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                result.Add(&quot;client_id&quot;, userId);
+                result.Add(&quot;private_key&quot;, private_key);
+                result.Add(&quot;fileId&quot;, fileId);
+                String error = null;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_663">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_663">&#182;</a>
+							</div>
+							<p>Check is all needed fields are entered</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                if (userId == null || private_key == null || fileId == null)
+                {
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_664">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_664">&#182;</a>
+							</div>
+							<p>If not all fields entered send error message</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    error = &quot;Please enter all parameters&quot;;
+                    result.Add(&quot;error&quot;, error);
+                    return View(&quot;Sample28&quot;, null, result);
+                }
+                else
+                {
+                    if (basePath == &quot;&quot;)
+                    {
+                        basePath = &quot;https://api.groupdocs.com/v2.0&quot;;
+                    }
+                    result.Add(&quot;basePath&quot;, basePath);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_665">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_665">&#182;</a>
+							</div>
+							<p>Create service for Groupdocs account</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    GroupdocsService service = new GroupdocsService(basePath, userId, private_key);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_666">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_666">&#182;</a>
+							</div>
+							<p>Get all annotations from document</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    Groupdocs.Api.Contract.Annotation.ListAnnotationsResult annotations = service.ListAnnotations(fileId);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_667">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_667">&#182;</a>
+							</div>
+							<p>If annotations wasn't found return error</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (annotations.Annotations.Length == 0)
+                    {
+
+                        error = &quot;File you are entered contains no annotations&quot;;
+                        result.Add(&quot;error&quot;, error);
+                        return View(&quot;Sample28&quot;, null, result);
+
+                    }
+                    Groupdocs.Api.Contract.Annotation.DeleteAnnotationResult delAnnot = null;
+                    if (annotations.Annotations.Length != 0)
+                    {
+                        String message = &quot;All annotations deleted successfully&quot;;
+                        result.Add(&quot;message&quot;, message);
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_668">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_668">&#182;</a>
+							</div>
+							<p>Get annotations data</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                        for (int i = 0; i &lt; annotations.Annotations.Length; i++)
+                        {
+                            delAnnot = service.DeleteAnnotation(annotations.Annotations[i].Guid);
+                       
+                        }
+                    }
+                    String url = &quot;&quot;;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_669">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_669">&#182;</a>
+							</div>
+							<p>iframe to prodaction server</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    if (basePath.Equals(&quot;https://api.groupdocs.com/v2.0&quot;)) {
+                        url = &quot;https://apps.groupdocs.com/document-viewer/embed/&quot; + fileId;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_670">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_670">&#182;</a>
+							</div>
+							<p>iframe to dev server</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    } else if (basePath.Equals(&quot;https://dev-api.groupdocs.com/v2.0&quot;)) {
+                        url = &quot;https://dev-apps.groupdocs.com/document-viewer/embed/&quot; + fileId;
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_671">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_671">&#182;</a>
+							</div>
+							<p>iframe to test server</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    } else if (basePath.Equals(&quot;https://stage-api.groupdocs.com/v2.0&quot;)) {
+                        url = &quot;https://stage-apps.groupdocs.com/document-viewer/embed/&quot; + fileId;
+                    } else if (basePath.Equals(&quot;http://realtime-api.groupdocs.com&quot;)) {
+                        url = &quot;http://realtime-apps.groupdocs.com/document-viewer/embed/&quot; + fileId;
+                    }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_672">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_672">&#182;</a>
+							</div>
+							<p>Set data for template</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>                    result.Add(&quot;url&quot;, url);
+                    return View(&quot;Sample28&quot;, null, result);
+                }
+
+            }
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_673">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_673">&#182;</a>
+							</div>
+							<p>If data not posted return to template for filling of necessary fields</p>
+
+						</td>
+						<td class="code">
+							<pre><code class='prettyprint'>            else
+            {
+                return View(&quot;Sample28&quot;);
+            }
+        }
+
+</code></pre>
+						</td>
+					</tr>
+					<tr id="section_674">
+						<td class="docs">
+							<div class="pilwrap">
+								<a class="pilcrow" href="#section_674">&#182;</a>
+							</div>
 							<h3>Callback check for Sample18</h3>
 
 						</td>
@@ -10706,10 +10954,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_660">
+					<tr id="section_675">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_660">&#182;</a>
+								<a class="pilcrow" href="#section_675">&#182;</a>
 							</div>
 							<p>String fileInfo = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";</p>
 
@@ -10719,10 +10967,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_661">
+					<tr id="section_676">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_661">&#182;</a>
+								<a class="pilcrow" href="#section_676">&#182;</a>
 							</div>
 							<p>String userInfo = System.IO.File.ReadLines(infoFile);</p>
 
@@ -10736,10 +10984,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_662">
+					<tr id="section_677">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_662">&#182;</a>
+								<a class="pilcrow" href="#section_677">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -10758,10 +11006,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_663">
+					<tr id="section_678">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_663">&#182;</a>
+								<a class="pilcrow" href="#section_678">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -10771,10 +11019,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_664">
+					<tr id="section_679">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_664">&#182;</a>
+								<a class="pilcrow" href="#section_679">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -10787,10 +11035,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_665">
+					<tr id="section_680">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_665">&#182;</a>
+								<a class="pilcrow" href="#section_680">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -10804,10 +11052,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_666">
+					<tr id="section_681">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_666">&#182;</a>
+								<a class="pilcrow" href="#section_681">&#182;</a>
 							</div>
 							<p>Definition of folder where to download file</p>
 
@@ -10823,10 +11071,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_667">
+					<tr id="section_682">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_667">&#182;</a>
+								<a class="pilcrow" href="#section_682">&#182;</a>
 							</div>
 							<h3>Make a request to Storage Api for dowloading file</h3>
 
@@ -10841,10 +11089,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_668">
+					<tr id="section_683">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_668">&#182;</a>
+								<a class="pilcrow" href="#section_683">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -10856,10 +11104,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_669">
+					<tr id="section_684">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_669">&#182;</a>
+								<a class="pilcrow" href="#section_684">&#182;</a>
 							</div>
 							<p>String jobId = System.IO.File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "downloads/convert_callback.txt");</p>
 
@@ -10875,10 +11123,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_670">
+					<tr id="section_685">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_670">&#182;</a>
+								<a class="pilcrow" href="#section_685">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -10923,10 +11171,10 @@ if URL to web file was provided - upload the file from Web and get it's GUID</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_671">
+					<tr id="section_686">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_671">&#182;</a>
+								<a class="pilcrow" href="#section_686">&#182;</a>
 							</div>
 							<p>form the link to result file
 result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
@@ -10940,10 +11188,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_672">
+					<tr id="section_687">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_672">&#182;</a>
+								<a class="pilcrow" href="#section_687">&#182;</a>
 							</div>
 							<h3>Callback check for Sample19</h3>
 
@@ -10953,10 +11201,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_673">
+					<tr id="section_688">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_673">&#182;</a>
+								<a class="pilcrow" href="#section_688">&#182;</a>
 							</div>
 							<p>Get user info</p>
 
@@ -10971,10 +11219,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_674">
+					<tr id="section_689">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_674">&#182;</a>
+								<a class="pilcrow" href="#section_689">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -10990,10 +11238,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_675">
+					<tr id="section_690">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_675">&#182;</a>
+								<a class="pilcrow" href="#section_690">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -11003,10 +11251,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_676">
+					<tr id="section_691">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_676">&#182;</a>
+								<a class="pilcrow" href="#section_691">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -11018,10 +11266,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_677">
+					<tr id="section_692">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_677">&#182;</a>
+								<a class="pilcrow" href="#section_692">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -11033,10 +11281,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_678">
+					<tr id="section_693">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_678">&#182;</a>
+								<a class="pilcrow" href="#section_693">&#182;</a>
 							</div>
 							<p>Definition of folder where to download file</p>
 
@@ -11049,10 +11297,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_679">
+					<tr id="section_694">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_679">&#182;</a>
+								<a class="pilcrow" href="#section_694">&#182;</a>
 							</div>
 							<h3>Make a request to Storage Api for dowloading file</h3>
 
@@ -11066,10 +11314,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_680">
+					<tr id="section_695">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_680">&#182;</a>
+								<a class="pilcrow" href="#section_695">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -11083,10 +11331,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_681">
+					<tr id="section_696">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_681">&#182;</a>
+								<a class="pilcrow" href="#section_696">&#182;</a>
 							</div>
 							<h3>Callback check for Sample21</h3>
 
@@ -11096,10 +11344,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_682">
+					<tr id="section_697">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_682">&#182;</a>
+								<a class="pilcrow" href="#section_697">&#182;</a>
 							</div>
 							<p>Get user info</p>
 
@@ -11114,10 +11362,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_683">
+					<tr id="section_698">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_683">&#182;</a>
+								<a class="pilcrow" href="#section_698">&#182;</a>
 							</div>
 							<p>Check is data posted </p>
 
@@ -11133,10 +11381,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_684">
+					<tr id="section_699">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_684">&#182;</a>
+								<a class="pilcrow" href="#section_699">&#182;</a>
 							</div>
 							<p>Create service for Groupdocs account</p>
 
@@ -11146,10 +11394,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_685">
+					<tr id="section_700">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_685">&#182;</a>
+								<a class="pilcrow" href="#section_700">&#182;</a>
 							</div>
 							<p>Make request to api for get document info by job id</p>
 
@@ -11161,10 +11409,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_686">
+					<tr id="section_701">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_686">&#182;</a>
+								<a class="pilcrow" href="#section_701">&#182;</a>
 							</div>
 							<p>Return file guid to the template</p>
 
@@ -11176,10 +11424,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_687">
+					<tr id="section_702">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_687">&#182;</a>
+								<a class="pilcrow" href="#section_702">&#182;</a>
 							</div>
 							<p>Definition of folder where to download file</p>
 
@@ -11192,10 +11440,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_688">
+					<tr id="section_703">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_688">&#182;</a>
+								<a class="pilcrow" href="#section_703">&#182;</a>
 							</div>
 							<h3>Make a request to Storage Api for dowloading file</h3>
 
@@ -11209,10 +11457,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_689">
+					<tr id="section_704">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_689">&#182;</a>
+								<a class="pilcrow" href="#section_704">&#182;</a>
 							</div>
 							<p>If data not posted return to template for filling of necessary fields</p>
 
@@ -11227,10 +11475,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_690">
+					<tr id="section_705">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_690">&#182;</a>
+								<a class="pilcrow" href="#section_705">&#182;</a>
 							</div>
 							<p>Method for file downloading from JS</p>
 
@@ -11250,10 +11498,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_691">
+					<tr id="section_706">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_691">&#182;</a>
+								<a class="pilcrow" href="#section_706">&#182;</a>
 							</div>
 							<p>path to settings file - temporary save userId and apiKey like to property file</p>
 
@@ -11264,10 +11512,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_692">
+					<tr id="section_707">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_692">&#182;</a>
+								<a class="pilcrow" href="#section_707">&#182;</a>
 							</div>
 							<p>open file in rewrite mode</p>
 
@@ -11277,10 +11525,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_693">
+					<tr id="section_708">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_693">&#182;</a>
+								<a class="pilcrow" href="#section_708">&#182;</a>
 							</div>
 							<p>String filePath = AppDomain.CurrentDomain.BaseDirectory + "user_info.txt";</p>
 
@@ -11290,10 +11538,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_694">
+					<tr id="section_709">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_694">&#182;</a>
+								<a class="pilcrow" href="#section_709">&#182;</a>
 							</div>
 							<p>w = System.IO.File.CreateText(filePath);</p>
 
@@ -11308,10 +11556,10 @@ result = "<a href='/downloads/" + result + "'>Converted file</a>";</p>
 </code></pre>
 						</td>
 					</tr>
-					<tr id="section_695">
+					<tr id="section_710">
 						<td class="docs">
 							<div class="pilwrap">
-								<a class="pilcrow" href="#section_695">&#182;</a>
+								<a class="pilcrow" href="#section_710">&#182;</a>
 							</div>
 							<p>check if Downloads folder exists and remove it to clean all old files</p>
 

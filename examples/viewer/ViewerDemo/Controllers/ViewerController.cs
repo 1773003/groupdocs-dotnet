@@ -16,10 +16,11 @@ namespace ViewerDemo.Controllers
         [HttpPost]
         public ActionResult Upload()
         {
+            
             // Read settings from the configuration file.
             var baseAddress = ConfigurationManager.AppSettings["baseAddress"];
-            var userId = ConfigurationManager.AppSettings["userId"];
-            var privateKey = ConfigurationManager.AppSettings["privateKey"];
+            String userId = Request.Form["client_id"];
+            String privateKey = Request.Form["private_key"];
 
             // Create service for uploading file to Groupdocs account
             var service = new GroupdocsService(baseAddress, userId, privateKey);

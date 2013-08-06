@@ -571,8 +571,21 @@ namespace SamplesApp.Controllers
                         // If document signed  
                         if (sign.Status.Equals("Ok"))
                         {
-                            // Put to the result's list received GUID.
-                            result.Add("guid", sign.Result.DocumentId);
+                            System.Threading.Thread.Sleep(5000);
+                            Groupdocs.Api.Contract.SignatureSignDocumentStatusResponse getDocumentStatus = service.GetSignDocumentStatus(sign.Result.JobId);
+                            if (getDocumentStatus.Status.Equals("Ok"))
+                            {
+                                // Put to the result's list received GUID.
+                                result.Add("guid", getDocumentStatus.Result.Documents[0].DocumentId);
+                            }
+                            else
+                            {
+                                // Redirect to viewer with error.
+                                message = getDocumentStatus.ErrorMessage;
+                                result.Add("error", message);
+                                return View("Sample06", null, result);
+                            }
+                            
                             
                         }
                         // If request returns error
@@ -971,13 +984,13 @@ namespace SamplesApp.Controllers
                         {
                             iframe = "https://apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
                         }
-                        if (basePath.Equals("https://dev-api.groupdocs.com/v2.0"))
+                        if (basePath.Equals("https://dev-api-groupdocs.dynabic.com/v2.0"))
                         {
-                            iframe = "https://dev-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                            iframe = "https://dev-apps-groupdocs.dynabic.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
                         }
-                        if (basePath.Equals("https://stage-api.groupdocs.com/v2.0"))
+                        if (basePath.Equals("https://stage-api-groupdocs.dynabic.com/v2.0"))
                         {
-                            iframe = "https://stage-apps.groupdocs.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                            iframe = "https://stage-apps-groupdocs.dynabic.com/document-viewer/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
                         }
                         if (basePath.Equals("https://realtime-api.groupdocs.com/v2.0"))
                         {
@@ -991,13 +1004,13 @@ namespace SamplesApp.Controllers
                         {
                             iframe = "https://apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
                         }
-                        if (basePath.Equals("https://dev-api.groupdocs.com/v2.0"))
+                        if (basePath.Equals("https://dev-api-groupdocs.dynabic.com/v2.0"))
                         {
-                            iframe = "https://dev-apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                            iframe = "https://dev-apps-groupdocs.dynabic.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
                         }
-                        if (basePath.Equals("https://stage-api.groupdocs.com/v2.0"))
+                        if (basePath.Equals("https://stage-api-groupdocs.dynabic.com/v2.0"))
                         {
-                            iframe = "https://stage-apps.groupdocs.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
+                            iframe = "https://stage-apps-groupdocs.dynabic.com/document-annotation2/embed/" + fileGuId + " frameborder=0 width=" + width + " height=" + height;
                         }
                         if (basePath.Equals("https://realtime-api.groupdocs.com/v2.0"))
                         {
@@ -2561,78 +2574,88 @@ namespace SamplesApp.Controllers
                         Groupdocs.Api.Contract.SignatureEnvelopeResponse envelop = service.CreateEnvelope("", "", fileName, guid, false);
                         if (envelop.Status.Equals("Ok"))
                         {
-                            decimal dec = new decimal();
-                            //Get role list for curent user
-                            Groupdocs.Api.Contract.SignatureRolesResponse roles = service.GetSignatureRoles("");
-                            String roleId = "";
-                            //Get id of role which can sign
-                            for (int i = 0; i < roles.Result.Roles.Length; i++)
+                            decimal order = new decimal();
+                            Groupdocs.Api.Contract.SignatureEnvelopeDocumentResponse addDocument = service.AddEnvelopeDocument(envelop.Result.Envelope.Id, guid, order, true);
+                            if (addDocument.Status.Equals("Ok"))
                             {
-                                if (roles.Result.Roles[i].Name.Equals("Signer"))
+                                decimal dec = new decimal();
+                                //Get role list for curent user
+                                Groupdocs.Api.Contract.SignatureRolesResponse roles = service.GetSignatureRoles("");
+                                String roleId = "";
+                                //Get id of role which can sign
+                                for (int i = 0; i < roles.Result.Roles.Length; i++)
                                 {
-                                    roleId = roles.Result.Roles[i].Id;
-                                    break;
-                                }
-                            }
-                            //Add recipient to envelope
-                            Groupdocs.Api.Contract.SignatureEnvelopeRecipientResponse addRecipient = service.AddEnvelopeRecipient(envelop.Result.Envelope.Id, email, name, lastName, roleId, dec);
-                            if (addRecipient.Status.Equals("Ok"))
-                            {
-                                Groupdocs.Api.Contract.SignatureEnvelopeDocumentsResponse getDocuments = service.GetEnvelopeDocuments(envelop.Result.Envelope.Id);
-                                if (getDocuments.Status.Equals("Ok"))
-                                {
-                                    Groupdocs.Api.Contract.SignatureEnvelopeFieldsResponse getFields = service.GetEnvelopeFields(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id);
-                                    if (getFields.Status.Equals("Ok"))
+                                    if (roles.Result.Roles[i].Name.Equals("Signer"))
                                     {
-                                        Groupdocs.Api.Contract.SignatureEnvelopeFieldInfo[] fieldInfo = getFields.Result.Fields;
-                                        if (fieldInfo.Length == 0)
+                                        roleId = roles.Result.Roles[i].Id;
+                                        break;
+                                    }
+                                }
+                                //Add recipient to envelope
+                                Groupdocs.Api.Contract.SignatureEnvelopeRecipientResponse addRecipient = service.AddEnvelopeRecipient(envelop.Result.Envelope.Id, email, name, lastName, roleId, dec);
+                                if (addRecipient.Status.Equals("Ok"))
+                                {
+                                    Groupdocs.Api.Contract.SignatureEnvelopeDocumentsResponse getDocuments = service.GetEnvelopeDocuments(envelop.Result.Envelope.Id);
+                                    if (getDocuments.Status.Equals("Ok"))
+                                    {
+                                        Groupdocs.Api.Contract.SignatureEnvelopeFieldsResponse getFields = service.GetEnvelopeFields(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id);
+                                        if (getFields.Status.Equals("Ok"))
                                         {
-                                            result.Add("error", "You use a wrong file, it's don't content any fields for sign");
-                                            return View("Sample21", null, result);
+                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldInfo[] fieldInfo = getFields.Result.Fields;
+                                            if (fieldInfo.Length == 0)
+                                            {
+                                                result.Add("error", "You use a wrong file, it's don't content any fields for sign");
+                                                return View("Sample21", null, result);
+                                            }
+                                            for (int n = 0; n < fieldInfo.Length; n++)
+                                            {
+                                                Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings fieldsSettings = new Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings();
+                                                fieldsSettings.Name = fieldInfo[n].Name;
+                                                fieldsSettings.LocationHeight = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationHeight);
+                                                fieldsSettings.LocationWidth = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationWidth);
+                                                fieldsSettings.LocationX = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationX);
+                                                fieldsSettings.LocationY = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationY);
+                                                Groupdocs.Api.Contract.SignatureEnvelopeFieldResponse addFields = service.AddEnvelopeField(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id, fieldInfo[n].Id, fieldsSettings);
+                                            }
+                                            //Send envelop with callback url
+                                            Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
+                                            //Check is envelope send status
+                                            if (send.Status.Equals("Ok"))
+                                            {
+                                                //Set data for template
+                                                result.Add("envelop", envelop.Result.Envelope.Id);
+                                                result.Add("recipient", addRecipient.Result.Recipient.Id);
+                                                return View("Sample21", null, result);
+                                            }
+                                            //If status failed set error for template
+                                            else
+                                            {
+                                                result.Add("error", send.ErrorMessage);
+                                                return View("Sample21", null, result);
+                                            }
+
                                         }
-                                        for (int n = 0; n < fieldInfo.Length; n++)
-                                        {
-                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings fieldsSettings = new Groupdocs.Api.Contract.SignatureEnvelopeFieldSettings();
-                                            fieldsSettings.Name = fieldInfo[n].Name;
-                                            fieldsSettings.LocationHeight = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationHeight);
-                                            fieldsSettings.LocationWidth = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationWidth);
-                                            fieldsSettings.LocationX = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationX);
-                                            fieldsSettings.LocationY = Convert.ToDecimal(fieldInfo[n].Locations[0].LocationY);
-                                            Groupdocs.Api.Contract.SignatureEnvelopeFieldResponse addFields = service.AddEnvelopeField(envelop.Result.Envelope.Id, getDocuments.Result.Documents[0].DocumentId, addRecipient.Result.Recipient.Id, fieldInfo[n].Id, fieldsSettings);
-                                        }
-                                        //Send envelop with callback url
-                                        Groupdocs.Api.Contract.SignatureEnvelopeSendResponse send = service.SendEnvelope(envelop.Result.Envelope.Id, callback);
-                                        //Check is envelope send status
-                                        if (send.Status.Equals("Ok"))
-                                        {
-                                            //Set data for template
-                                            result.Add("envelop", envelop.Result.Envelope.Id);
-                                            result.Add("recipient", addRecipient.Result.Recipient.Id);
-                                            return View("Sample21", null, result);
-                                        }
-                                        //If status failed set error for template
                                         else
                                         {
-                                            result.Add("error", send.ErrorMessage);
+                                            result.Add("error", getFields.ErrorMessage);
                                             return View("Sample21", null, result);
                                         }
-                                        
                                     }
                                     else
                                     {
-                                        result.Add("error", getFields.ErrorMessage);
+                                        result.Add("error", getDocuments.ErrorMessage);
                                         return View("Sample21", null, result);
                                     }
                                 }
                                 else
                                 {
-                                    result.Add("error", getDocuments.ErrorMessage);
+                                    result.Add("error", addRecipient.ErrorMessage);
                                     return View("Sample21", null, result);
                                 }
                             }
                             else
                             {
-                                result.Add("error", addRecipient.ErrorMessage);
+                                result.Add("error", addDocument.ErrorMessage);
                                 return View("Sample21", null, result);
                             }
                         }
@@ -3483,11 +3506,13 @@ namespace SamplesApp.Controllers
                     if (basePath.Equals("https://api.groupdocs.com/v2.0")) {
                         url = "https://apps.groupdocs.com/document-viewer/embed/" + fileId;
                         //iframe to dev server
-                    } else if (basePath.Equals("https://dev-api.groupdocs.com/v2.0")) {
-                        url = "https://dev-apps.groupdocs.com/document-viewer/embed/" + fileId;
+                    } else if (basePath.Equals("https://dev-api-groupdocs.dynabic.com/v2.0")) {
+                        url = "https://dev-apps-groupdocs.dynabic.com/document-viewer/embed/" + fileId;
                         //iframe to test server
-                    } else if (basePath.Equals("https://stage-api.groupdocs.com/v2.0")) {
-                        url = "https://stage-apps.groupdocs.com/document-viewer/embed/" + fileId;
+                    }
+                    else if (basePath.Equals("https://stage-api-groupdocs.dynabic.com/v2.0"))
+                    {
+                        url = "https://stage-apps-groupdocs.dynabic.com/document-viewer/embed/" + fileId;
                     } else if (basePath.Equals("http://realtime-api.groupdocs.com")) {
                         url = "http://realtime-apps.groupdocs.com/document-viewer/embed/" + fileId;
                     }

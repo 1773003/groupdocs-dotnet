@@ -19,8 +19,8 @@ namespace AnnotationDemo.Controllers
         {
             // Read settings from the configuration file.
             var baseAddress = ConfigurationManager.AppSettings["baseAddress"];
-            var userId = ConfigurationManager.AppSettings["userId"];
-            var privateKey = ConfigurationManager.AppSettings["privateKey"];
+            String userId = Request.Form["client_id"];
+            String privateKey = Request.Form["private_key"];
 
             // Create service for uploading file to Groupdocs account
             var service = new GroupdocsService(baseAddress, userId, privateKey);
@@ -33,7 +33,7 @@ namespace AnnotationDemo.Controllers
                 if (file.ContentLength > 0)
                 {
                     // Upload file with empty description.
-                    var result = service.UploadFile(file.FileName, String.Empty, file.InputStream);
+                    var result = service.UploadFile(file.FileName, String.Empty, file.InputStream, false, String.Empty);
                     // Redirect to Annotation viewer with received GUID.
                     return RedirectToAction("Index", new {guid = result.Guid});
                 }
@@ -47,8 +47,8 @@ namespace AnnotationDemo.Controllers
         {
             // Read settings from the configuration file.
             var baseAddress = ConfigurationManager.AppSettings["baseAddress"];
-            var userId = ConfigurationManager.AppSettings["userId"];
-            var privateKey = ConfigurationManager.AppSettings["privateKey"];
+            String userId = Request.Form["client_id"];
+            String privateKey = Request.Form["private_key"];
 
             var service = new GroupdocsService(baseAddress, userId, privateKey);
             try

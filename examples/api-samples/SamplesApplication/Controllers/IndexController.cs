@@ -2270,7 +2270,7 @@ namespace SamplesApp.Controllers
                     //Compare two documents and setting collback Url
                     Groupdocs.Api.Comparison.Contract.CompareResponse compare = service.Compare(sourceFileId, targetFileId, callback);
 
-                    if (compare.Status.Equals("Completed") || compare.Status.Equals("Archived"))
+                    if (compare.Status.Equals("Ok"))
                     {
                         //Delay necessary that the inquiry would manage to be processed
                         System.Threading.Thread.Sleep(5000);
